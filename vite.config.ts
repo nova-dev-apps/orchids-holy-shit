@@ -1,13 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { componentTaggerPlugin } from "./src/visual-edits/component-tagger-plugin.js";
 
 // Minimal plugin to log build-time and dev-time errors to console
 const logErrorsPlugin = () => ({
   name: "log-errors-plugin",
-  // Inject a small client-side script that mirrors Vite overlay errors to console
   transformIndexHtml() {
     return {
       tags: [
@@ -24,9 +22,7 @@ const logErrorsPlugin = () => ({
                 try { text = root.textContent || ''; } catch (_) {}
                 if (text && text.trim()) {
                   const msg = text.trim();
-                  // Use console.error to surface clearly in DevTools
                   console.error('[Vite Overlay]', msg);
-                  // Also mirror to parent iframe with structured payload
                   try {
                     if (window.parent && window.parent !== window) {
                       window.parent.postMessage({
@@ -50,7 +46,6 @@ const logErrorsPlugin = () => ({
               obs.observe(document.documentElement, { childList: true, subtree: true });
 
               window.addEventListener('DOMContentLoaded', logOverlay);
-              // Attempt immediately as overlay may already exist
               logOverlay();
             } catch (e) {
               console.warn('[Vite Overlay logger failed]', e);
@@ -66,6 +61,10 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 3000,
+    fs: {
+      strict: true,
+      deny: ["**/.*"],
+    },
   },
   plugins: [
     react(),
@@ -74,20 +73,14 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@": path.resolve(import.meta.dirname, "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
-  root: path.resolve(import.meta.dirname, "client"),
+  root: path.resolve(import.meta.dirname),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-  },
-  server: {
-    fs: {
-      strict: true,
-      deny: ["**/.*"],
-    },
   },
 }));
