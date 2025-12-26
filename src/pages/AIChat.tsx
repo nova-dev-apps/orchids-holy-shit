@@ -400,6 +400,19 @@ const AIChat = () => {
         
         setIsThinking(true);
   
+        const aiResponseId = (Date.now() + 1).toString();
+        
+        // Add initial empty AI message immediately
+        setContentState(prev => ({
+          ...prev,
+          [activeTab]: [...prev[activeTab], {
+            id: aiResponseId,
+            text: "",
+            isUser: false,
+            timestamp: new Date()
+          }]
+        }));
+
           // If AI config is available, use real API
           if (apiConfig?.api_key && apiConfig?.endpoint_url) {
             try {
@@ -439,19 +452,8 @@ const AIChat = () => {
             const decoder = new TextDecoder();
             let aiText = "";
             
-            const aiResponseId = (Date.now() + 1).toString();
+            // Empty message already added above
             
-            // Add initial empty AI message
-            setContentState(prev => ({
-              ...prev,
-              [activeTab]: [...prev[activeTab], {
-                id: aiResponseId,
-                text: "",
-                isUser: false,
-                timestamp: new Date()
-              }]
-            }));
-
             if (reader) {
               while (true) {
                 const { done, value } = await reader.read();
