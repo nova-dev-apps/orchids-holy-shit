@@ -404,27 +404,11 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
                       </div>
                     </div>
 
-                    {/* AI API Editor */}
-                    <div className="space-y-3">
-                      <h3 className="text-sm font-medium text-foreground">AI API Editor</h3>
                       <div className="space-y-3">
-                        <div>
-                          <Label className="text-sm font-medium text-foreground mb-1 block">
-                            Select Feature
-                          </Label>
-                          <Select value={apiEditorFeature} onValueChange={setApiEditorFeature}>
-                            <SelectTrigger className="border-border focus:border-nova-pink bg-background">
-                              <SelectValue placeholder="Choose feature..." />
-                            </SelectTrigger>
-                            <SelectContent className="bg-background border-border z-[100]">
-                              <SelectItem value="chatbot">Chatbot</SelectItem>
-                              <SelectItem value="automation">Automation</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="ai-api-key" className="text-sm font-medium text-foreground mb-1 block">
+                        <h3 className="text-sm font-medium text-foreground">AI API Editor</h3>
+                        <div className="space-y-3">
+                          <div>
+                            <Label htmlFor="ai-api-key" className="text-sm font-medium text-foreground mb-1 block">
                             API Key
                           </Label>
                           <Input
