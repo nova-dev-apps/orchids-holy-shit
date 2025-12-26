@@ -79,7 +79,8 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
   useEffect(() => {
     const adminEmail = "abdisamadbashir14@gmail.com";
     const storedEmail = localStorage.getItem("userEmail");
-    setIsAdmin(storedEmail === adminEmail);
+    const isUserAdmin = storedEmail === adminEmail;
+    setIsAdmin(isUserAdmin);
 
     const storedDay = localStorage.getItem("maxTokensDay");
     const storedMonth = localStorage.getItem("maxTokensMonth");
@@ -91,7 +92,29 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
       setMaxTokensMonth(storedMonth);
       setMonthlyCredits(parseInt(storedMonth));
     }
+
+    if (isUserAdmin) {
+      fetchAiConfig();
+    }
   }, []);
+
+  const fetchAiConfig = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_config')
+        .select('*')
+        .eq('id', 'global')
+        .single();
+      
+      if (error) throw error;
+      if (data) {
+        setApiEditorKey(data.api_key || "");
+        setApiEditorEndpoint(data.endpoint_url || "");
+      }
+    } catch (error) {
+      console.error("Error fetching AI config:", error);
+    }
+  };
 
   // Listen for token updates from admin
   useEffect(() => {
