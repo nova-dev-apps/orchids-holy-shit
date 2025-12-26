@@ -41,6 +41,7 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
   // AI API Editor settings
   const [apiEditorKey, setApiEditorKey] = useState("");
   const [apiEditorEndpoint, setApiEditorEndpoint] = useState("");
+  const [apiEditorModel, setApiEditorModel] = useState("");
 
   // Token settings
   const [maxTokensDay, setMaxTokensDay] = useState("10000");
