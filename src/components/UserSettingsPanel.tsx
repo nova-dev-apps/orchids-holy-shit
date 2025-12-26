@@ -461,19 +461,33 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
                           />
                         </div>
 
-                        <div>
-                          <Label htmlFor="ai-api-endpoint" className="text-sm font-medium text-foreground mb-1 block">
-                            API Endpoint
-                          </Label>
-                          <Input
-                            id="ai-api-endpoint"
-                            type="text"
-                            placeholder="Enter API endpoint URL..."
-                            value={apiEditorEndpoint}
-                            onChange={(e) => setApiEditorEndpoint(e.target.value)}
-                            className="border-border focus:border-nova-pink"
-                          />
-                        </div>
+                          <div>
+                            <Label htmlFor="ai-api-endpoint" className="text-sm font-medium text-foreground mb-1 block">
+                              API Endpoint
+                            </Label>
+                            <Input
+                              id="ai-api-endpoint"
+                              type="text"
+                              placeholder="Enter API endpoint URL..."
+                              value={apiEditorEndpoint}
+                              onChange={(e) => setApiEditorEndpoint(e.target.value)}
+                              className="border-border focus:border-nova-pink"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="ai-api-model" className="text-sm font-medium text-foreground mb-1 block">
+                              API Model
+                            </Label>
+                            <Input
+                              id="ai-api-model"
+                              type="text"
+                              placeholder="Enter model (e.g. gpt-4o)..."
+                              value={apiEditorModel}
+                              onChange={(e) => setApiEditorModel(e.target.value)}
+                              className="border-border focus:border-nova-pink"
+                            />
+                          </div>
 
                         <Button
                           onClick={handleSaveApiEditor}
