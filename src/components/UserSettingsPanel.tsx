@@ -111,6 +111,7 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
       if (data) {
         setApiEditorKey(data.api_key || "");
         setApiEditorEndpoint(data.endpoint_url || "");
+        setApiEditorModel(data.model || "");
       }
     } catch (error) {
       console.error("Error fetching AI config:", error);
