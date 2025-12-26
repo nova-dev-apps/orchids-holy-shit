@@ -331,11 +331,11 @@ const AIChat = () => {
                       )}
                     </div>
                     ) : (
-                      // AI Message
-                      <div className="w-full animate-blur-in flex flex-col gap-2">
-                        <div className="text-black text-base leading-relaxed max-w-full bg-transparent border-none shadow-none p-0">
-                          {msg.text}
-                        </div>
+                        // AI Message
+                        <div className="w-full animate-blur-in flex flex-col gap-2">
+                          <div className="text-black text-base leading-relaxed max-w-full whitespace-pre-wrap break-words">
+                            {msg.text}
+                          </div>
                         <div className="flex items-center gap-1">
                           <Button
                             variant="ghost"
