@@ -185,65 +185,71 @@ const Signup = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 text-sm">
+              <p>Welcome to Nova. These Terms and Conditions govern your use of Nova's platform, services, and content. By using Nova, you agree to these Terms.</p>
+              
               <div>
-                <h3 className="font-semibold mb-2">1. Nature of Service: The "Human-in-the-Loop" Rule</h3>
-                <p>Nova is an AI-powered automation tool. Because AI can make mistakes:</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li><strong>User Supervision:</strong> You agree to supervise Nova while it is performing actions on your PC.</li>
-                  <li><strong>The "Stop" Button:</strong> You are responsible for using the "Stop" button if you observe Nova performing an incorrect or harmful action.</li>
-                  <li><strong>Assumption of Risk:</strong> You acknowledge that giving an AI control over your mouse and keyboard carries inherent risks to your local files and software.</li>
-                </ul>
+                <h3 className="font-semibold mb-1">1. Eligibility</h3>
+                <p>You must be at least 18 years old to use Nova. By using Nova, you confirm that you meet this requirement.</p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">2. Eligibility & Account</h3>
+                <h3 className="font-semibold mb-1">2. Account Registration</h3>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>You must be 18 years or older (or the age of majority in your jurisdiction) to use Nova for business purposes.</li>
-                  <li>One license (Unique .exe) is for one user. Sharing your unique agent file is a breach of these terms.</li>
-                </ul>
-              </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">3. Subscriptions & The "No-Refund" Policy</h3>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>The Price:</strong> Nova is a premium service billed at $135 USD per month.</li>
-                    <li><strong>Final Sale:</strong> Due to the high cost of AI processing power (API tokens) and the digital nature of the software, all payments are strictly non-refundable.</li>
-                    <li><strong>Failed Payments:</strong> If your PayPal subscription fails, Nova’s "Silent Bridge" will immediately disconnect, and your local agent will be locked until payment is resolved.</li>
-                  </ul>
-                </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">4. Prohibited Use</h3>
-                <p>You may not use Nova to:</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li>Automate illegal activities (hacking, scraping private data, etc.).</li>
-                  <li>Bypass security protocols on third-party websites.</li>
-                  <li>Create a "bot farm" that violates the terms of service of other platforms (like social media or banking sites).</li>
+                  <li>You must provide accurate and complete information when creating a Nova account.</li>
+                  <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+                  <li>You are fully responsible for all activities under your account.</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">5. Intellectual Property</h3>
+                <h3 className="font-semibold mb-1">3. Subscriptions and Payments</h3>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li><strong>Nova’s Code:</strong> You may not decompile or reverse-engineer the .exe agent.</li>
-                  <li><strong>Your Data:</strong> You own all "Outputs" (the work Nova does for you). Nova does not claim ownership of your spreadsheets, emails, or files.</li>
+                  <li>Certain features of Nova require a paid subscription.</li>
+                  <li>Subscriptions renew automatically unless canceled before renewal.</li>
+                  <li>By subscribing, you authorize Nova to charge your payment method.</li>
+                  <li>If a payment fails, access to Nova may be suspended or terminated.</li>
+                  <li>Payments are non-refundable.</li>
                 </ul>
               </div>
 
-                <div>
-                  <h3 className="font-semibold mb-2">6. Limitation of Liability (The "Shield" Clause)</h3>
-                  <p className="font-medium uppercase">TO THE MAXIMUM EXTENT PERMITTED BY LAW, NOVA SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
-                  <ul className="list-disc pl-5 mt-2 space-y-1">
-                    <li>Loss of data or corrupted files.</li>
-                    <li>Software crashes or OS instability.</li>
-                    <li>Actions taken by the AI that violate third-party terms of service.</li>
-                  </ul>
-                  <p className="mt-2"><strong>Maximum Cap:</strong> In any event, Nova’s total liability to you shall not exceed the amount you paid for the current month’s subscription ($135).</p>
-                </div>
+              <div>
+                <h3 className="font-semibold mb-1">4. License of Use</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Nova grants you a limited, non-transferable license to use the platform.</li>
+                  <li>You may not copy, modify, distribute, or reverse-engineer Nova.</li>
+                  <li>You may not use Nova for unlawful or harmful purposes.</li>
+                </ul>
+              </div>
 
               <div>
-                <h3 className="font-semibold mb-2">7. Governing Law</h3>
-                <p>These terms are governed by the laws of [Your Country/State]. Any disputes will be settled via [Arbitration/Local Court].</p>
+                <h3 className="font-semibold mb-1">5. User Content</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>You retain ownership of content you upload to Nova.</li>
+                  <li>You are responsible for ensuring your content complies with laws and does not infringe rights.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-1">6. Prohibited Conduct</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>You may not attempt to disrupt or damage Nova's systems.</li>
+                  <li>You may not impersonate others or misrepresent your affiliation.</li>
+                  <li>You may not use Nova to distribute harmful, illegal, or abusive material.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-1">7. Intellectual Property</h3>
+                <p>All rights in Nova's software, design, and brand remain with Nova.</p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-1">8. Limitation of Liability</h3>
+                <p>Nova is provided "as is." We are not responsible for any actions taken by the AI on your device, including data loss or software issues. You agree to supervise the agent and use the "Stop" button if necessary. Our total liability is limited to the amount you paid for your current subscription month ($135).</p>
+              </div>
+
+              <div className="pt-4 border-t">
+                <p>For more information contact (nova.platforms.ai@gmail.com)</p>
               </div>
             </div>
           </DialogContent>
