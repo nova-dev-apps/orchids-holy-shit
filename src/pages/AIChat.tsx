@@ -354,30 +354,32 @@ const AIChat = () => {
         
         setIsThinking(true);
   
-        // If AI config is available, use real API
-        if (apiConfig?.api_key && apiConfig?.endpoint_url) {
-          try {
-            const baseUrl = apiConfig.endpoint_url.replace(/\/+$/, '');
-            const url = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
+          // If AI config is available, use real API
+          if (apiConfig?.api_key && apiConfig?.endpoint_url) {
+            try {
+              const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
+              const url = cleanUrl.toLowerCase().endsWith('/chat/completions') 
+                ? cleanUrl 
+                : `${cleanUrl}/chat/completions`;
 
-            const response = await fetch(url, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiConfig.api_key}`
-              },
-              body: JSON.stringify({
-                model: apiConfig.model || "gpt-4o",
-                messages: [
-                  ...messages.slice(0, lastUserIndex).map(m => ({
-                    role: m.isUser ? "user" : "assistant",
-                    content: m.text
-                  })),
-                  { role: "user", content: lastUserMessage.text }
-                ],
-                stream: false
-              })
-            });
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${apiConfig.api_key.trim()}`
+                },
+                body: JSON.stringify({
+                  model: apiConfig.model?.trim() || "gpt-4o",
+                  messages: [
+                    ...messages.slice(0, lastUserIndex).map(m => ({
+                      role: m.isUser ? "user" : "assistant",
+                      content: m.text
+                    })),
+                    { role: "user", content: lastUserMessage.text }
+                  ],
+                  stream: false
+                })
+              });
 
           if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
