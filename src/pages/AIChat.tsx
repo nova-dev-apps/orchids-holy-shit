@@ -338,6 +338,10 @@ const AIChat = () => {
               }
             }
         } catch (error: any) {
+          if (error.name === 'AbortError') {
+            console.log('Fetch aborted');
+            return;
+          }
           console.error("AI API Error:", error);
           toast.error(`AI Error: ${error.message}`);
           
@@ -354,6 +358,7 @@ const AIChat = () => {
           }));
         } finally {
           setIsThinking(false);
+          abortControllerRef.current = null;
         }
       } else {
         // Fallback to simulation if not configured
@@ -529,6 +534,10 @@ const AIChat = () => {
             }
 
         } catch (error: any) {
+          if (error.name === 'AbortError') {
+            console.log('Fetch aborted');
+            return;
+          }
           console.error("AI API Error:", error);
           toast.error(`AI Error: ${error.message}`);
           
@@ -545,6 +554,7 @@ const AIChat = () => {
           }));
         } finally {
           setIsThinking(false);
+          abortControllerRef.current = null;
         }
       } else {
         // Fallback to simulation if not configured
