@@ -219,17 +219,19 @@ const AIChat = () => {
       // If AI config is available, use real API
       if (apiConfig?.api_key && apiConfig?.endpoint_url) {
         try {
-          const baseUrl = apiConfig.endpoint_url.replace(/\/+$/, '');
-          const url = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
-          
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${apiConfig.api_key}`
-            },
-            body: JSON.stringify({
-              model: apiConfig.model || "gpt-4o",
+            const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
+            const url = cleanUrl.toLowerCase().endsWith('/chat/completions') 
+              ? cleanUrl 
+              : `${cleanUrl}/chat/completions`;
+            
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiConfig.api_key.trim()}`
+              },
+              body: JSON.stringify({
+                model: apiConfig.model?.trim() || "gpt-4o",
               messages: [
                 ...contentState[activeTab].map(m => ({
                   role: m.isUser ? "user" : "assistant",
