@@ -47,6 +47,31 @@ const AIChat = () => {
   // Check admin status
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
+  const fetchAiConfig = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_config')
+        .select('api_key, endpoint_url')
+        .eq('id', 'global')
+        .single();
+      
+      if (error) throw error;
+      if (data) {
+        setApiConfig(data);
+      }
+    } catch (error) {
+      console.error("Error fetching AI config in chat:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAiConfig();
+
+    const handleUpdate = () => fetchAiConfig();
+    window.addEventListener('ai-config-update', handleUpdate);
+    return () => window.removeEventListener('ai-config-update', handleUpdate);
+  }, []);
+
   // Load last session on mount
   useEffect(() => {
     const lastSessionId = localStorage.getItem("lastChatSession");
