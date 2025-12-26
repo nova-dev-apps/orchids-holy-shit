@@ -203,14 +203,14 @@ const Signup = () => {
                 </ul>
               </div>
 
-              <div>
-                <h3 className="font-semibold mb-2">3. Subscriptions & The "No-Refund" Policy</h3>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li><strong>The Price:</strong> Nova is a premium service billed per month.</li>
-                  <li><strong>Final Sale:</strong> Due to the high cost of AI processing power (API tokens) and the digital nature of the software, all payments are strictly non-refundable.</li>
-                  <li><strong>Failed Payments:</strong> If your PayPal subscription fails, Nova’s "Silent Bridge" will immediately disconnect, and your local agent will be locked until payment is resolved.</li>
-                </ul>
-              </div>
+                <div>
+                  <h3 className="font-semibold mb-2">3. Subscriptions & The "No-Refund" Policy</h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>The Price:</strong> Nova is a premium service billed at $135 USD per month.</li>
+                    <li><strong>Final Sale:</strong> Due to the high cost of AI processing power (API tokens) and the digital nature of the software, all payments are strictly non-refundable.</li>
+                    <li><strong>Failed Payments:</strong> If your PayPal subscription fails, Nova’s "Silent Bridge" will immediately disconnect, and your local agent will be locked until payment is resolved.</li>
+                  </ul>
+                </div>
 
               <div>
                 <h3 className="font-semibold mb-2">4. Prohibited Use</h3>
