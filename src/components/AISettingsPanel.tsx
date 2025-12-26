@@ -203,52 +203,23 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
           {/* Settings Panel */}
           <div className={`fixed right-0 top-0 h-full w-80 bg-background border-l border-border shadow-xl overflow-y-auto z-50 transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="relative">
-                  <button
-                    onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex items-center gap-2 text-lg font-semibold text-foreground hover:opacity-80 transition-opacity"
-                  >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-foreground">
                     Chatbot Settings
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-                  {showDropdown && (
-                    <div className="absolute top-full left-0 mt-2 w-48 bg-background border border-border rounded-md shadow-lg z-10">
-                      <button
-                        onClick={() => {
-                          setActiveSection('chatbot');
-                          setShowDropdown(false);
-                        }}
-                        className={`w-full text-left px-4 py-2 hover:bg-accent transition-colors border-b border-border ${activeSection === 'chatbot' ? 'text-nova-pink font-semibold' : 'text-foreground'}`}
-                      >
-                        Chatbot
-                      </button>
-                      {isAdmin && (
-                        <button
-                          onClick={() => {
-                            setActiveSection('automation');
-                            setShowDropdown(false);
-                          }}
-                          className={`w-full text-left px-4 py-2 hover:bg-accent transition-colors ${activeSection === 'automation' ? 'text-nova-pink font-semibold' : 'text-foreground'}`}
-                        >
-                          Automation
-                        </button>
-                      )}
-                    </div>
-                  )}
+                  </h2>
+                  <Button
+                    onClick={onToggle}
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-accent"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  onClick={onToggle}
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-accent"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <div>
-                {activeSection === 'chatbot' ? renderChatSettings() : renderAutomationSettings()}
-              </div>
+                <div className="space-y-8">
+                  {renderChatSettings()}
+                  {renderAutomationSettings()}
+                </div>
             </div>
           </div>
         </div>
