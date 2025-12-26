@@ -208,6 +208,30 @@ const AIChat = () => {
     }
   };
 
+  const handleCopy = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedMessageId(id);
+    toast.success("Copied to clipboard");
+    setTimeout(() => setCopiedMessageId(null), 2000);
+  };
+
+  const handleRegenerate = () => {
+    const messages = contentState[activeTab];
+    const lastUserMessage = [...messages].reverse().find(m => m.isUser);
+    
+    if (lastUserMessage) {
+      // Optional: remove last AI message if it's the latest
+      const lastMessage = messages[messages.length - 1];
+      if (!lastMessage.isUser) {
+        setContentState(prev => ({
+          ...prev,
+          [activeTab]: prev[activeTab].slice(0, -1)
+        }));
+      }
+      handleSendMessage(lastUserMessage.text, lastUserMessage.attachments || []);
+    }
+  };
+
   const getPlaceholder = () => {
     return '';
   };
