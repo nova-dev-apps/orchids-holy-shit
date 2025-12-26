@@ -236,36 +236,72 @@ const AIChat = () => {
               },
               body: JSON.stringify({
                 model,
-              messages: [
-                ...contentState[activeTab].map(m => ({
-                  role: m.isUser ? "user" : "assistant",
-                  content: m.text
-                })),
-                { role: "user", content: messageText }
-              ],
-              stream: false
-            })
-          });
+                messages: [
+                  ...contentState[activeTab].map(m => ({
+                    role: m.isUser ? "user" : "assistant",
+                    content: m.text
+                  })),
+                  { role: "user", content: messageText }
+                ],
+                stream: true
+              })
+            });
 
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `API error: ${response.status}`);
-          }
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(errorData.error?.message || `API error: ${response.status}`);
+            }
 
-          const data = await response.json();
-          const aiText = data.choices[0]?.message?.content || "No response from AI";
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+            let aiText = "";
+            
+            const aiResponseId = (Date.now() + 1).toString();
+            
+            // Add initial empty AI message
+            setContentState(prev => ({
+              ...prev,
+              [activeTab]: [...prev[activeTab], {
+                id: aiResponseId,
+                text: "",
+                isUser: false,
+                timestamp: new Date()
+              }]
+            }));
 
-          const aiResponse: Message = {
-            id: (Date.now() + 1).toString(),
-            text: aiText,
-            isUser: false,
-            timestamp: new Date()
-          };
+            if (reader) {
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
 
-          setContentState(prev => ({
-            ...prev,
-            [activeTab]: [...prev[activeTab], aiResponse]
-          }));
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split("\n");
+                
+                for (const line of lines) {
+                  const trimmedLine = line.trim();
+                  if (!trimmedLine || !trimmedLine.startsWith("data: ")) continue;
+                  
+                  const data = trimmedLine.slice(6);
+                  if (data === "[DONE]") break;
+
+                  try {
+                    const json = JSON.parse(data);
+                    const content = json.choices[0]?.delta?.content || "";
+                    if (content) {
+                      aiText += content;
+                      setContentState(prev => ({
+                        ...prev,
+                        [activeTab]: prev[activeTab].map(msg => 
+                          msg.id === aiResponseId ? { ...msg, text: aiText } : msg
+                        )
+                      }));
+                    }
+                  } catch (e) {
+                    // Ignore parsing errors for partial chunks
+                  }
+                }
+              }
+            }
         } catch (error: any) {
           console.error("AI API Error:", error);
           toast.error(`AI Error: ${error.message}`);
