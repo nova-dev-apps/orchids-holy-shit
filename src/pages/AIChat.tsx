@@ -314,7 +314,7 @@ const AIChat = () => {
     document.body.removeChild(textArea);
   };
 
-  const handleRegenerate = (targetId?: string) => {
+  const handleRegenerate = async (targetId?: string) => {
     const messages = contentState[activeTab];
     let targetMsgId = targetId;
     
