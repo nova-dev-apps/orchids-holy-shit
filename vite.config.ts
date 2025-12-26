@@ -10,10 +10,11 @@ export default defineConfig({
       "@shared": path.resolve(import.meta.dirname, "shared"),
     },
   },
-  server: {
-    host: "::",
-    port: 5173,
-  },
+    server: {
+      host: "0.0.0.0",
+      port: 8080,
+      strictPort: true,
+    },
   root: path.resolve(import.meta.dirname),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
