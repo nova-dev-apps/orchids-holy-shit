@@ -267,12 +267,26 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
     });
   };
 
-  const handleSaveApiEditor = () => {
-    console.log("Saving AI API editor settings:", {
-      feature: apiEditorFeature,
-      key: apiEditorKey ? "***" : "",
-      endpoint: apiEditorEndpoint
-    });
+  const handleSaveApiEditor = async () => {
+    try {
+      const { error } = await supabase
+        .from('ai_config')
+        .upsert({
+          id: 'global',
+          api_key: apiEditorKey,
+          endpoint_url: apiEditorEndpoint,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+      toast.success("AI API configuration saved successfully");
+      
+      // Notify other components (like AIChat) that config has changed
+      window.dispatchEvent(new Event('ai-config-update'));
+    } catch (error: any) {
+      console.error("Error saving AI config:", error);
+      toast.error(error.message || "Failed to save AI configuration");
+    }
   };
 
   const handleSavePayPal = () => {
