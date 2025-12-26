@@ -150,6 +150,26 @@ const AIChat = () => {
     localStorage.setItem("lastChatSession", newSessionId);
   };
 
+  const handleStop = () => {
+    if (aiTimeoutRef.current) {
+      clearTimeout(aiTimeoutRef.current);
+      aiTimeoutRef.current = null;
+      setIsThinking(false);
+
+      const stoppedMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        text: "the response was stopped",
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setContentState(prev => ({
+        ...prev,
+        [activeTab]: [...prev[activeTab], stoppedMessage]
+      }));
+    }
+  };
+
   const handleSendMessage = (messageText: string, attachments: Attachment[]) => {
     if (messageText.trim() || attachments.length > 0) {
       const newMessage: Message = {
@@ -168,8 +188,9 @@ const AIChat = () => {
       setIsThinking(true);
 
       // Simulate AI response after a delay
-      setTimeout(() => {
+      aiTimeoutRef.current = setTimeout(() => {
         setIsThinking(false);
+        aiTimeoutRef.current = null;
         const aiResponse: Message = {
           id: (Date.now() + 1).toString(),
           text: `AI response for ${activeTab}: ${messageText || 'Received your attachments'}`,
