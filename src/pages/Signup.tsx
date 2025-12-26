@@ -368,47 +368,82 @@ const Signup = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 text-sm">
-              <p>
-                This Privacy Policy describes how Nova protects your privacy and
-                ensures your data security when you use our platform.
-              </p>
-
               <div>
-                <h3 className="font-semibold mb-2">End-to-End Encryption</h3>
+                <h3 className="font-semibold mb-2">1. Privacy by Design</h3>
                 <p>
-                  Nova uses end-to-end encryption to protect all your data. This
-                  means your information is encrypted on your device before it
-                  ever reaches our servers, and only you have the keys to
-                  decrypt it.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">No Data Collection</h3>
-                <p>
-                  We do not collect, store, or have access to your personal
-                  information, conversations, or content. Everything remains
-                  private and secure on your device.
+                  Nova is built on the principle of Data Minimization. We believe
+                  that your desktop is your private space. Our architecture
+                  ensures that we only process the minimum information required
+                  to execute your requested automations.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2">
-                  Zero Knowledge Architecture
+                  2. Confidential Processing (Not "E2EE")
                 </h3>
                 <p>
-                  Nova operates on a zero-knowledge principle - we cannot see,
-                  read, or access your data even if we wanted to. Your privacy
-                  is built into the core of our platform.
+                  While data is being analyzed by the AI brain, it is protected
+                  by Industry-Standard TLS Encryption in transit.
                 </p>
+                <div className="mt-2 space-y-2">
+                  <p>
+                    <strong>Volatile Memory:</strong> Your screenshots are
+                    processed in "volatile memory" (RAM) and are never written
+                    to a permanent disk on our servers.
+                  </p>
+                  <p>
+                    <strong>Instant Purge:</strong> Once a coordinate is
+                    identified (e.g., "Click the Submit button"), the visual
+                    data is instantly deleted from the processing stream.
+                  </p>
+                </div>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Data Security</h3>
+                <h3 className="font-semibold mb-2">3. Zero-Knowledge Intent</h3>
                 <p>
-                  All communications and data are encrypted using
-                  industry-standard encryption protocols. Your information never
-                  leaves your device in an unencrypted state.
+                  Nova operates on a Zero-Knowledge Architecture regarding your
+                  identity.
+                </p>
+                <div className="mt-2 space-y-2">
+                  <p>
+                    <strong>Anonymized IDs:</strong> We do not link your PC
+                    activities to your personal name or email. We use a
+                    Randomized User ID to communicate with the AI brain.
+                  </p>
+                  <p>
+                    <strong>No Training:</strong> We use professional-tier API
+                    agreements that legally prohibit the AI models from using
+                    your data to train future versions of the AI.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">4. Local Sovereignty</h3>
+                <p>
+                  Because Nova is a Local Agent (.exe), you retain 100% control:
+                </p>
+                <div className="mt-2 space-y-2">
+                  <p>
+                    <strong>Local Execution:</strong> The actual "clicking" and
+                    "typing" happen on your machine, not in the cloud.
+                  </p>
+                  <p>
+                    <strong>The Kill-Switch:</strong> You can stop any
+                    automation instantly using the "Stop" button or by closing
+                    the local application.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">5. No Data Monetization</h3>
+                <p>
+                  We are a subscription-based service ($135/mo). You are the
+                  customer, not the product. We do not sell, rent, or share your
+                  data with advertisers or third-party data brokers.
                 </p>
               </div>
 
