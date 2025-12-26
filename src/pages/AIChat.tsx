@@ -315,10 +315,11 @@ const AIChat = () => {
               activeTab={activeTab}
               strictMode={strictMode}
                 onToggleStrictMode={() => setStrictMode(!strictMode)}
-                isAdmin={isAdmin}
-                onAutoModeToggle={setIsAutoMode}
-                isGenerating={isThinking}
-              />
+                  isAdmin={isAdmin}
+                  onAutoModeToggle={setIsAutoMode}
+                  isGenerating={isThinking}
+                  onStop={handleStop}
+                />
           </div>
         </div>
       </div>
