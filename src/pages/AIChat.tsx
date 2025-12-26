@@ -282,14 +282,37 @@ const AIChat = () => {
                         </div>
                       )}
                     </div>
-                  ) : (
-                    // AI Message
-                    <div className="w-full animate-blur-in">
-                      <div className="text-black text-base leading-relaxed max-w-full bg-transparent border-none shadow-none p-0">
-                        {msg.text}
+                    ) : (
+                      // AI Message
+                      <div className="w-full animate-blur-in flex flex-col gap-2">
+                        <div className="text-black text-base leading-relaxed max-w-full bg-transparent border-none shadow-none p-0">
+                          {msg.text}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-gray-400 hover:text-black hover:bg-gray-100"
+                            onClick={() => handleCopy(msg.text, msg.id)}
+                          >
+                            {copiedMessageId === msg.id ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-gray-400 hover:text-black hover:bg-gray-100"
+                            onClick={handleRegenerate}
+                          >
+                            <RotateCcw className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+
                 </div>
               ))}
               
