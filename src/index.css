@@ -59,6 +59,11 @@
     --radius: 0.5rem;
   }
 
+  .auto-mode-glow textarea {
+    border-color: #FF6B9D !important;
+    box-shadow: 0 0 10px rgba(255, 107, 157, 0.2);
+  }
+
   .dark {
     --background: 340 100% 98%;
     --foreground: 222.2 84% 4.9%;
