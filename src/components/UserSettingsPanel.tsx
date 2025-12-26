@@ -37,7 +37,6 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
   const [subscriptionCurrency, setSubscriptionCurrency] = useState("$");
 
   // AI API Editor settings
-  const [apiEditorFeature, setApiEditorFeature] = useState<string>("chatbot");
   const [apiEditorKey, setApiEditorKey] = useState("");
   const [apiEditorEndpoint, setApiEditorEndpoint] = useState("");
 
