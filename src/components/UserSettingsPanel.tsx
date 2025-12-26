@@ -475,19 +475,65 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
                             />
                           </div>
 
-                          <div>
-                            <Label htmlFor="ai-api-model" className="text-sm font-medium text-foreground mb-1 block">
-                              API Model
-                            </Label>
-                            <Input
-                              id="ai-api-model"
-                              type="text"
-                              placeholder="Enter model (e.g. gpt-4o)..."
-                              value={apiEditorModel}
-                              onChange={(e) => setApiEditorModel(e.target.value)}
-                              className="border-border focus:border-nova-pink"
-                            />
-                          </div>
+                            <div>
+                              <Label htmlFor="ai-api-model" className="text-sm font-medium text-foreground mb-1 block">
+                                API Model
+                              </Label>
+                              <div className="flex gap-2">
+                                <Popover open={openModelCombobox} onOpenChange={setOpenModelCombobox}>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      aria-expanded={openModelCombobox}
+                                      className="w-full justify-between border-border"
+                                    >
+                                      {apiEditorModel || "Select model..."}
+                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-80 p-0 z-[60]">
+                                    <Command>
+                                      <CommandInput placeholder="Search models..." />
+                                      <CommandEmpty>No model found.</CommandEmpty>
+                                      <CommandGroup className="max-h-60 overflow-auto">
+                                        {popularModels.chat.map((model) => (
+                                          <CommandItem
+                                            key={model}
+                                            value={model}
+                                            onSelect={(currentValue) => {
+                                              setApiEditorModel(currentValue);
+                                              setOpenModelCombobox(false);
+                                              
+                                              // Auto-fill endpoint if empty
+                                              if (!apiEditorEndpoint) {
+                                                setApiEditorEndpoint(getEndpointForModel(currentValue) + "/chat/completions");
+                                              }
+                                            }}
+                                          >
+                                            <Check
+                                              className={cn(
+                                                "mr-2 h-4 w-4",
+                                                apiEditorModel === model ? "opacity-100" : "opacity-0"
+                                              )}
+                                            />
+                                            {model}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </Command>
+                                  </PopoverContent>
+                                </Popover>
+                                <Input
+                                  id="ai-api-model"
+                                  type="text"
+                                  placeholder="Or enter custom..."
+                                  value={apiEditorModel}
+                                  onChange={(e) => setApiEditorModel(e.target.value)}
+                                  className="border-border focus:border-nova-pink"
+                                />
+                              </div>
+                            </div>
 
                         <Button
                           onClick={handleSaveApiEditor}
