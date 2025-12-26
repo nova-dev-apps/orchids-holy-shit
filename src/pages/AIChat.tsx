@@ -622,24 +622,26 @@ const AIChat = () => {
                                         <div className="flex items-center gap-2 mb-1">
                                             {isAutoMode ? (
                                               <>
-                                                  <div className="relative w-5 h-5 animate-pulse flex items-center justify-center">
-                                                    <Wrench 
-                                                      size={16} 
-                                                      className="absolute" 
-                                                      style={{ 
-                                                        color: 'black', 
-                                                        transform: 'rotate(-45deg) translate(-1px, -1px)' 
-                                                      }} 
-                                                    />
-                                                    <Hammer 
-                                                      size={16} 
-                                                      className="absolute" 
-                                                      style={{ 
-                                                        color: 'black', 
-                                                        transform: 'rotate(45deg) translate(1px, -1px)' 
-                                                      }} 
-                                                    />
-                                                  </div>
+                                                    <div className="relative w-5 h-5 animate-pulse flex items-center justify-center overflow-visible">
+                                                      <Wrench 
+                                                        size={16} 
+                                                        className="absolute" 
+                                                        style={{ 
+                                                          color: 'black', 
+                                                          transform: 'rotate(-40deg) translate(-2px, -2px)',
+                                                          transformOrigin: 'center'
+                                                        }} 
+                                                      />
+                                                      <Hammer 
+                                                        size={16} 
+                                                        className="absolute" 
+                                                        style={{ 
+                                                          color: 'black', 
+                                                          transform: 'rotate(40deg) translate(2px, -2px)',
+                                                          transformOrigin: 'center'
+                                                        }} 
+                                                      />
+                                                    </div>
                                                 <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
                                               </>
                                             ) : (
