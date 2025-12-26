@@ -12,7 +12,7 @@ export default defineConfig({
   },
   server: {
     host: "::",
-    port: 3000,
+    port: 5173,
   },
   root: path.resolve(import.meta.dirname),
   build: {
