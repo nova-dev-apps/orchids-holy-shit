@@ -632,19 +632,19 @@ const AIChat = () => {
                               <div className="w-full flex flex-col gap-2">
                                 {/* Thinking / Automating Indicator - Only show when no text has appeared yet */}
                                   {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && !msg.text && (
-                                    <div className="flex items-center gap-2 mb-1">
-                                      {isAutoMode ? (
-                                        <>
-                                          <Wrench size={16} className="animate-pulse text-black" />
-                                          <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Brain size={16} className="animate-pulse text-black" />
-                                          <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
-                                        </>
-                                      )}
-                                    </div>
+                                      <div className="flex items-center gap-2 mb-1">
+                                        {isAutoMode ? (
+                                          <>
+                                            <Wrench size={16} className="animate-pulse" style={{ color: 'black' }} />
+                                            <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Brain size={16} className="animate-pulse" style={{ color: 'black' }} />
+                                            <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
+                                          </>
+                                        )}
+                                      </div>
                                   )}
                                 
                                 {/* Message Text */}
