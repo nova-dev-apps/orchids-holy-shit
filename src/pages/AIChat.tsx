@@ -324,12 +324,14 @@ const AIChat = () => {
                 }
               }
             }
-          } catch (error: any) {
-            if (error.name === 'AbortError' || error.message?.includes('aborted')) {
-              console.log('Fetch aborted');
-              return;
-            }
-            console.error("AI API Error:", error);
+            } catch (error: any) {
+              if (error.name === 'AbortError' || 
+                  error.message?.toLowerCase().includes('aborted') || 
+                  error.message?.includes('BodyStreamBuffer')) {
+                console.log('Fetch aborted');
+                return;
+              }
+              console.error("AI API Error:", error);
           toast.error(`AI Error: ${error.message}`);
           
           const errorResponse: Message = {
@@ -516,12 +518,14 @@ const AIChat = () => {
               }
             }
 
-          } catch (error: any) {
-            if (error.name === 'AbortError' || error.message?.includes('aborted')) {
-              console.log('Fetch aborted');
-              return;
-            }
-            console.error("AI API Error:", error);
+            } catch (error: any) {
+              if (error.name === 'AbortError' || 
+                  error.message?.toLowerCase().includes('aborted') || 
+                  error.message?.includes('BodyStreamBuffer')) {
+                console.log('Fetch aborted');
+                return;
+              }
+              console.error("AI API Error:", error);
           toast.error(`AI Error: ${error.message}`);
           
           const errorResponse: Message = {
