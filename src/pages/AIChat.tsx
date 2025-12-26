@@ -281,7 +281,7 @@ const AIChat = () => {
         )}
 
         {/* Fixed bottom input area */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-20">
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-gray-100 z-20">
           {/* Message input */}
           <div className="relative">
             <ChatInput
