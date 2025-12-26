@@ -333,7 +333,7 @@ const AIChat = () => {
                     ) : (
                         // AI Message
                         <div className="w-full animate-blur-in flex flex-col gap-2">
-                          <div className="text-black text-base leading-relaxed max-w-full whitespace-pre-wrap break-words">
+                          <div className="text-black text-base leading-relaxed max-w-[85%] whitespace-pre-wrap break-words">
                             {msg.text}
                           </div>
                         <div className="flex items-center gap-1">
