@@ -582,31 +582,31 @@ const AIChat = () => {
                       )}
                     </div>
                       ) : (
-                            // AI Message
-                            <div className="w-full animate-blur-in flex flex-col gap-2">
-                              {/* Thinking / Automating Indicator - Only show when no text has appeared yet */}
-                                {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && !msg.text && (
-                                  <div className="flex items-center gap-2 mb-1">
-                                    {isAutoMode ? (
-                                      <>
-                                        <Wrench size={16} className="animate-pulse text-black" />
-                                        <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Brain size={16} className="animate-pulse text-black" />
-                                        <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
-                                      </>
-                                    )}
+                              // AI Message
+                              <div className="w-full flex flex-col gap-2">
+                                {/* Thinking / Automating Indicator - Only show when no text has appeared yet */}
+                                  {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && !msg.text && (
+                                    <div className="flex items-center gap-2 mb-1">
+                                      {isAutoMode ? (
+                                        <>
+                                          <Wrench size={16} className="animate-pulse text-black" />
+                                          <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Brain size={16} className="animate-pulse text-black" />
+                                          <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
+                                        </>
+                                      )}
+                                    </div>
+                                  )}
+                                
+                                {/* Message Text */}
+                                {msg.text && (
+                                  <div className="text-black text-base leading-relaxed max-w-[85%] whitespace-pre-wrap break-words animate-blur-in">
+                                    {msg.text}
                                   </div>
                                 )}
-                              
-                              {/* Message Text */}
-                              {msg.text && (
-                                <div className="text-black text-base leading-relaxed max-w-[85%] whitespace-pre-wrap break-words">
-                                  {msg.text}
-                                </div>
-                              )}
 
                               {/* Action Buttons - Only show when response is finished */}
                               {(!isThinking || msg.id !== currentMessages[currentMessages.length - 1].id) && msg.text && (
