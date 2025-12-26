@@ -208,22 +208,14 @@ const AIChat = () => {
     }
   };
 
-  const handleCopy = async (text: string, id: string) => {
+  const handleCopy = (text: string, id: string) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    
     try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        textArea.style.top = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        document.execCommand('copy');
-        textArea.remove();
-      }
+      document.execCommand('copy');
       setCopiedMessageId(id);
       toast.success("Copied to clipboard");
       setTimeout(() => setCopiedMessageId(null), 2000);
@@ -231,20 +223,40 @@ const AIChat = () => {
       console.error('Failed to copy text: ', err);
       toast.error("Failed to copy text");
     }
+    document.body.removeChild(textArea);
   };
 
-  const handleRegenerate = () => {
+  const handleRegenerate = (targetId?: string) => {
     const messages = contentState[activeTab];
-    const lastUserIndex = [...messages].reverse().findIndex(m => m.isUser);
+    let targetMsgId = targetId;
+    
+    // If no targetId, use the last AI message
+    if (!targetMsgId) {
+      const lastAI = [...messages].reverse().find(m => !m.isUser);
+      if (lastAI) targetMsgId = lastAI.id;
+    }
+
+    if (!targetMsgId) return;
+
+    const targetIndex = messages.findIndex(m => m.id === targetMsgId);
+    if (targetIndex === -1) return;
+
+    // Find the user message that preceded this AI message
+    let lastUserIndex = -1;
+    for (let i = targetIndex - 1; i >= 0; i--) {
+      if (messages[i].isUser) {
+        lastUserIndex = i;
+        break;
+      }
+    }
     
     if (lastUserIndex !== -1) {
-      const actualLastUserIndex = messages.length - 1 - lastUserIndex;
-      const lastUserMessage = messages[actualLastUserIndex];
+      const lastUserMessage = messages[lastUserIndex];
       
-      // Remove everything after the last user message to "regenerate on the same spot"
+      // Remove everything from the target message onwards
       setContentState(prev => ({
         ...prev,
-        [activeTab]: prev[activeTab].slice(0, actualLastUserIndex + 1)
+        [activeTab]: prev[activeTab].slice(0, lastUserIndex + 1)
       }));
       
       setIsThinking(true);
