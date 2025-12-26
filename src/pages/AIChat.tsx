@@ -284,21 +284,25 @@ const AIChat = () => {
                   const data = trimmedLine.slice(6);
                   if (data === "[DONE]") break;
 
-                  try {
-                    const json = JSON.parse(data);
-                    const content = json.choices[0]?.delta?.content || "";
-                    if (content) {
-                      aiText += content;
-                      setContentState(prev => ({
-                        ...prev,
-                        [activeTab]: prev[activeTab].map(msg => 
-                          msg.id === aiResponseId ? { ...msg, text: aiText } : msg
-                        )
-                      }));
+                    try {
+                      const json = JSON.parse(data);
+                      const content = json.choices[0]?.delta?.content || "";
+                      if (content) {
+                        aiText += content;
+                        setContentState(prev => {
+                          const activeMessages = prev[activeTab];
+                          const lastMsg = activeMessages[activeMessages.length - 1];
+                          if (lastMsg.id === aiResponseId) {
+                            const newMessages = [...activeMessages];
+                            newMessages[newMessages.length - 1] = { ...lastMsg, text: aiText };
+                            return { ...prev, [activeTab]: newMessages };
+                          }
+                          return prev;
+                        });
+                      }
+                    } catch (e) {
+                      // Ignore parsing errors for partial chunks
                     }
-                  } catch (e) {
-                    // Ignore parsing errors for partial chunks
-                  }
                 }
               }
             }
