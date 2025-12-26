@@ -15,8 +15,7 @@ export default defineConfig({
       port: 3000,
       strictPort: true,
     },
-  root: path.resolve(import.meta.dirname),
-  build: {
+    build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
