@@ -208,11 +208,29 @@ const AIChat = () => {
     }
   };
 
-  const handleCopy = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedMessageId(id);
-    toast.success("Copied to clipboard");
-    setTimeout(() => setCopiedMessageId(null), 2000);
+  const handleCopy = async (text: string, id: string) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+      setCopiedMessageId(id);
+      toast.success("Copied to clipboard");
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      toast.error("Failed to copy text");
+    }
   };
 
   const handleRegenerate = () => {
