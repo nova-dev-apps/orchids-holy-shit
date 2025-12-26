@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, ArrowDown, Wrench } from "lucide-react";
+import { Brain, ArrowDown, Wrench, Copy, RotateCcw, Check } from "lucide-react";
 import { ChatInput, Attachment } from "@/components/ChatInput";
 import AISettingsPanel from "@/components/AISettingsPanel";
 import UserSettingsPanel from "@/components/UserSettingsPanel";
 import ChatHistory from "@/components/ChatHistory";
+import { toast } from "sonner";
 
 type ContentType = 'chat';
 
