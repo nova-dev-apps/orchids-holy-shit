@@ -42,6 +42,7 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
   const [apiEditorKey, setApiEditorKey] = useState("");
   const [apiEditorEndpoint, setApiEditorEndpoint] = useState("");
   const [apiEditorModel, setApiEditorModel] = useState("");
+  const [modelSearchValue, setModelSearchValue] = useState("");
 
   // Token settings
   const [maxTokensDay, setMaxTokensDay] = useState("10000");
