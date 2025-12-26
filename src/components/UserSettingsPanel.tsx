@@ -42,7 +42,6 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
   const [apiEditorEndpoint, setApiEditorEndpoint] = useState("");
 
   // Token settings
-  const [selectedTokenFeature, setSelectedTokenFeature] = useState<string>("chatbot");
   const [maxTokensDay, setMaxTokensDay] = useState("10000");
   const [maxTokensMonth, setMaxTokensMonth] = useState("50000");
   
