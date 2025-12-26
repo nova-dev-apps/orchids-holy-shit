@@ -636,7 +636,7 @@ const AIChat = () => {
                                                               className="absolute" 
                                                               style={{ 
                                                                 color: 'black', 
-                                                                transform: 'rotate(300deg)'
+                                                                transform: 'rotate(120deg)'
                                                               }} 
                                                             />
                                                       </div>
