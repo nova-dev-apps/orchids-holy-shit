@@ -38,6 +38,7 @@ const AIChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const aiTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check admin status
   const isAdmin = localStorage.getItem("isAdmin") === "true";
