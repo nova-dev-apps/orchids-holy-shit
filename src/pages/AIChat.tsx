@@ -365,6 +365,9 @@ const AIChat = () => {
                 ? cleanUrl 
                 : `${cleanUrl}/chat/completions`;
 
+              const rawModel = apiConfig.model?.trim() || "gpt-4o";
+              const model = rawModel.includes('/') ? rawModel.split('/').pop() : rawModel;
+
               const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -372,7 +375,7 @@ const AIChat = () => {
                   'Authorization': `Bearer ${apiConfig.api_key.trim()}`
                 },
                 body: JSON.stringify({
-                  model: apiConfig.model?.trim() || "gpt-4o",
+                  model,
                   messages: [
                     ...messages.slice(0, lastUserIndex).map(m => ({
                       role: m.isUser ? "user" : "assistant",
