@@ -199,7 +199,7 @@ const AIChat = () => {
     }
   };
 
-  const handleSendMessage = (messageText: string, attachments: Attachment[]) => {
+  const handleSendMessage = async (messageText: string, attachments: Attachment[]) => {
     if (messageText.trim() || attachments.length > 0) {
       const newMessage: Message = {
         id: Date.now().toString(),
@@ -216,22 +216,83 @@ const AIChat = () => {
       
       setIsThinking(true);
 
-      // Simulate AI response after a delay
-      aiTimeoutRef.current = setTimeout(() => {
-        setIsThinking(false);
-        aiTimeoutRef.current = null;
-        const aiResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          text: `AI response for ${activeTab}: ${messageText || 'Received your attachments'}`,
-          isUser: false,
-          timestamp: new Date()
-        };
+      // If AI config is available, use real API
+      if (apiConfig?.api_key && apiConfig?.endpoint_url) {
+        try {
+          const response = await fetch(`${apiConfig.endpoint_url.replace(/\/+$/, '')}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiConfig.api_key}`
+            },
+            body: JSON.stringify({
+              model: "gpt-4o", // Default model, ideally should be configurable
+              messages: [
+                ...contentState[activeTab].map(m => ({
+                  role: m.isUser ? "user" : "assistant",
+                  content: m.text
+                })),
+                { role: "user", content: messageText }
+              ],
+              stream: false
+            })
+          });
 
-        setContentState(prev => ({
-          ...prev,
-          [activeTab]: [...prev[activeTab], aiResponse]
-        }));
-      }, 2000);
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error?.message || `API error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          const aiText = data.choices[0]?.message?.content || "No response from AI";
+
+          const aiResponse: Message = {
+            id: (Date.now() + 1).toString(),
+            text: aiText,
+            isUser: false,
+            timestamp: new Date()
+          };
+
+          setContentState(prev => ({
+            ...prev,
+            [activeTab]: [...prev[activeTab], aiResponse]
+          }));
+        } catch (error: any) {
+          console.error("AI API Error:", error);
+          toast.error(`AI Error: ${error.message}`);
+          
+          const errorResponse: Message = {
+            id: (Date.now() + 1).toString(),
+            text: `Error: ${error.message}. Please check your AI configuration in settings.`,
+            isUser: false,
+            timestamp: new Date()
+          };
+          
+          setContentState(prev => ({
+            ...prev,
+            [activeTab]: [...prev[activeTab], errorResponse]
+          }));
+        } finally {
+          setIsThinking(false);
+        }
+      } else {
+        // Fallback to simulation if not configured
+        aiTimeoutRef.current = setTimeout(() => {
+          setIsThinking(false);
+          aiTimeoutRef.current = null;
+          const aiResponse: Message = {
+            id: (Date.now() + 1).toString(),
+            text: `(Simulation) AI response for ${activeTab}: ${messageText || 'Received your attachments'}`,
+            isUser: false,
+            timestamp: new Date()
+          };
+
+          setContentState(prev => ({
+            ...prev,
+            [activeTab]: [...prev[activeTab], aiResponse]
+          }));
+        }, 2000);
+      }
     }
   };
 
