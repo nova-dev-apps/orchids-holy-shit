@@ -219,7 +219,10 @@ const AIChat = () => {
       // If AI config is available, use real API
       if (apiConfig?.api_key && apiConfig?.endpoint_url) {
         try {
-          const response = await fetch(`${apiConfig.endpoint_url.replace(/\/+$/, '')}/chat/completions`, {
+          const baseUrl = apiConfig.endpoint_url.replace(/\/+$/, '');
+          const url = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
+          
+          const response = await fetch(url, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
