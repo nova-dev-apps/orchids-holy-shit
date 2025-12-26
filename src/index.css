@@ -158,7 +158,6 @@
   .animate-blur-in {
     animation: blur-in 0.5s ease-out forwards;
   }
-}
 
 @layer utilities {
   input[type="search"]::-webkit-search-cancel-button {
