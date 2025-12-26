@@ -6,6 +6,7 @@ import AISettingsPanel from "@/components/AISettingsPanel";
 import UserSettingsPanel from "@/components/UserSettingsPanel";
 import ChatHistory from "@/components/ChatHistory";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 type ContentType = 'chat';
 
