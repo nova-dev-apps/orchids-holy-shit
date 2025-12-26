@@ -577,21 +577,21 @@ const AIChat = () => {
                             // AI Message
                             <div className="w-full animate-blur-in flex flex-col gap-2">
                               {/* Thinking / Automating Indicator - Only show when no text has appeared yet */}
-                              {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && !msg.text && (
-                                <div className="flex items-center gap-2 mb-1">
-                                  {isAutoMode ? (
-                                    <>
-                                      <span className="text-lg" style={{ filter: 'grayscale(100%)' }}>🛠️</span>
-                                      <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Brain size={16} className="animate-pulse text-blue-500" />
-                                      <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
-                                    </>
-                                  )}
-                                </div>
-                              )}
+                                {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && !msg.text && (
+                                  <div className="flex items-center gap-2 mb-1">
+                                    {isAutoMode ? (
+                                      <>
+                                        <Wrench size={16} className="animate-pulse text-black" />
+                                        <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Brain size={16} className="animate-pulse text-black" />
+                                        <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
+                                      </>
+                                    )}
+                                  </div>
+                                )}
                               
                               {/* Message Text */}
                               {msg.text && (
