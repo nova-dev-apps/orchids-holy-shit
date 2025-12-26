@@ -359,7 +359,7 @@ const AIChat = () => {
               'Authorization': `Bearer ${apiConfig.api_key}`
             },
             body: JSON.stringify({
-              model: "gpt-4o",
+              model: apiConfig.model || "gpt-4o",
               messages: [
                 ...messages.slice(0, lastUserIndex).map(m => ({
                   role: m.isUser ? "user" : "assistant",
