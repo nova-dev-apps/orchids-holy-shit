@@ -10,6 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Settings, X, LogOut, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 interface UserSettingsPanelProps {
   isOpen: boolean;
