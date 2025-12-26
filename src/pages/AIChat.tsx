@@ -197,30 +197,18 @@ const AIChat = () => {
     const lastMsg = lastMessages[lastMessages.length - 1];
 
     if (lastMsg && !lastMsg.isUser && !lastMsg.text) {
-      // If we stop and the AI hasn't sent any text yet, update the empty message
+      // If we stop and the AI hasn't sent any text yet, update the empty message to show it was stopped
       setContentState(prev => {
         const activeMessages = prev[activeTab];
         const newMessages = [...activeMessages];
         newMessages[newMessages.length - 1] = { 
           ...newMessages[newMessages.length - 1], 
-          text: "the response was stopped" 
+          text: "The response was stopped." 
         };
         return { ...prev, [activeTab]: newMessages };
       });
-    } else {
-      // If it already started speaking or something else, append a new message or just stop
-      const stoppedMessage: Message = {
-        id: (Date.now() + 2).toString(),
-        text: "the response was stopped",
-        isUser: false,
-        timestamp: new Date()
-      };
-
-      setContentState(prev => ({
-        ...prev,
-        [activeTab]: [...prev[activeTab], stoppedMessage]
-      }));
     }
+    // If text already exists, we just stop right there without adding more text.
   };
 
   const handleSendMessage = async (messageText: string, attachments: Attachment[]) => {
