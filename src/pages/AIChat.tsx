@@ -620,24 +620,8 @@ const AIChat = () => {
                 </div>
               ))}
               
-              {/* Thinking Indicator */}
-              {isThinking && !isAutoMode && (
-                <div className="flex items-center gap-2 animate-pulse pl-0">
-                  <Brain size={16} className="text-gray-400" />
-                  <span className="text-sm text-gray-400 thinking-glow font-medium">thinking...</span>
-                </div>
-              )}
-
-              {/* Automation Indicator */}
-              {isThinking && isAutoMode && (
-                <div className="flex items-center gap-2 animate-pulse pl-0">
-                  <span className="text-lg" style={{ filter: 'grayscale(100%)' }}>🛠️</span>
-                  <span className="text-sm text-gray-400 thinking-glow font-medium">automating...</span>
-                </div>
-              )}
-              
-              <div ref={messagesEndRef} />
-            </div>
+                <div ref={messagesEndRef} />
+              </div>
           )}
         </div>
 
