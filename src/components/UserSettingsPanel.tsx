@@ -271,14 +271,15 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
 
   const handleSaveApiEditor = async () => {
     try {
-      const { error } = await supabase
-        .from('ai_config')
-        .upsert({
-          id: 'global',
-          api_key: apiEditorKey,
-          endpoint_url: apiEditorEndpoint,
-          updated_at: new Date().toISOString()
-        });
+        const { error } = await supabase
+          .from('ai_config')
+          .upsert({
+            id: 'global',
+            api_key: apiEditorKey,
+            endpoint_url: apiEditorEndpoint,
+            model: apiEditorModel,
+            updated_at: new Date().toISOString()
+          });
 
       if (error) throw error;
       toast.success("AI API configuration saved successfully");
