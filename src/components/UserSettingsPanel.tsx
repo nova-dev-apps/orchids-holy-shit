@@ -499,7 +499,7 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
                                           placeholder="Search or enter custom model..." 
                                           onValueChange={(value) => {
                                             // Allow selecting the current search value as a custom model
-                                            setCustomModel(value);
+                                            setModelSearchValue(value);
                                           }}
                                         />
                                         <CommandEmpty className="p-2">
@@ -507,14 +507,14 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
                                             variant="ghost" 
                                             className="w-full justify-start text-xs h-8"
                                             onClick={() => {
-                                              setApiEditorModel(customModel);
+                                              setApiEditorModel(modelSearchValue);
                                               setOpenModelCombobox(false);
                                               if (!apiEditorEndpoint) {
-                                                setApiEditorEndpoint(getEndpointForModel(customModel) + "/chat/completions");
+                                                setApiEditorEndpoint(getEndpointForModel(modelSearchValue) + "/chat/completions");
                                               }
                                             }}
                                           >
-                                            Use custom: {customModel}
+                                            Use custom: {modelSearchValue}
                                           </Button>
                                         </CommandEmpty>
                                         <CommandGroup className="max-h-60 overflow-auto">
