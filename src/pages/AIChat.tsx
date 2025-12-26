@@ -32,6 +32,7 @@ const AIChat = () => {
     chat: []
   });
   const [isThinking, setIsThinking] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [strictMode, setStrictMode] = useState(false);
   const [showScrollArrow, setShowScrollArrow] = useState(false);
   const [isAutoMode, setIsAutoMode] = useState(false);
