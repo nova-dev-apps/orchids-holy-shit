@@ -341,38 +341,41 @@ const AIChat = () => {
       }
     }
     
-    if (lastUserIndex !== -1) {
-      const lastUserMessage = messages[lastUserIndex];
-      
-      // Remove everything from the target message onwards
-      setContentState(prev => ({
-        ...prev,
-        [activeTab]: prev[activeTab].slice(0, lastUserIndex + 1)
-      }));
-      
-      setIsThinking(true);
+      if (lastUserIndex !== -1) {
+        const lastUserMessage = messages[lastUserIndex];
+        
+        // Remove everything from the target message onwards
+        setContentState(prev => ({
+          ...prev,
+          [activeTab]: prev[activeTab].slice(0, lastUserIndex + 1)
+        }));
+        
+        setIsThinking(true);
+  
+        // If AI config is available, use real API
+        if (apiConfig?.api_key && apiConfig?.endpoint_url) {
+          try {
+            const baseUrl = apiConfig.endpoint_url.replace(/\/+$/, '');
+            const url = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
 
-      // If AI config is available, use real API
-      if (apiConfig?.api_key && apiConfig?.endpoint_url) {
-        try {
-          const response = await fetch(`${apiConfig.endpoint_url.replace(/\/+$/, '')}/chat/completions`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${apiConfig.api_key}`
-            },
-            body: JSON.stringify({
-              model: apiConfig.model || "gpt-4o",
-              messages: [
-                ...messages.slice(0, lastUserIndex).map(m => ({
-                  role: m.isUser ? "user" : "assistant",
-                  content: m.text
-                })),
-                { role: "user", content: lastUserMessage.text }
-              ],
-              stream: false
-            })
-          });
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiConfig.api_key}`
+              },
+              body: JSON.stringify({
+                model: apiConfig.model || "gpt-4o",
+                messages: [
+                  ...messages.slice(0, lastUserIndex).map(m => ({
+                    role: m.isUser ? "user" : "assistant",
+                    content: m.text
+                  })),
+                  { role: "user", content: lastUserMessage.text }
+                ],
+                stream: false
+              })
+            });
 
           if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
