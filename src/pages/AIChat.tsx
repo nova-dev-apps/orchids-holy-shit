@@ -191,7 +191,7 @@ const AIChat = () => {
   const currentMessages = contentState[activeTab];
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-background flex">
       {/* Main chat area */}
       <div className="flex-1 flex flex-col relative">
         {/* Messages area */}
@@ -212,7 +212,7 @@ const AIChat = () => {
                 >
                   {msg.isUser ? (
                     // User Message
-                    <div className="max-w-[70%] p-4 rounded-2xl bg-white text-black border border-gray-200">
+                    <div className="max-w-[70%] p-4 rounded-2xl bg-white text-black border border-gray-200 shadow-sm">
                       {msg.text && <p className="text-sm leading-relaxed">{msg.text}</p>}
                       {msg.attachments && msg.attachments.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
