@@ -443,33 +443,19 @@ const UserSettingsPanel = ({ isOpen, onToggle }: UserSettingsPanelProps) => {
                       </div>
                     </div>
 
-                    {/* Token Limit Editor */}
-                    <div className="space-y-3">
-                      <h3 className="text-sm font-medium text-foreground">Token Limits</h3>
-                      <div className="grid grid-cols-1 gap-3">
-                        <div>
-                          <Label className="text-sm font-medium text-foreground mb-1 block">
-                            Select Feature to Tokenize
-                          </Label>
-                          <Select value={selectedTokenFeature} onValueChange={setSelectedTokenFeature}>
-                            <SelectTrigger className="border-border focus:border-nova-pink bg-background">
-                              <SelectValue placeholder="Choose feature..." />
-                            </SelectTrigger>
-                            <SelectContent className="bg-background border-border z-[100]">
-                              <SelectItem value="chatbot">Chatbot</SelectItem>
-                              <SelectItem value="automation">Automation</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium text-foreground mb-1 block">Max Tokens per Day</Label>
-                          <Input 
-                            type="number" 
-                            value={maxTokensDay} 
-                            onChange={(e) => setMaxTokensDay(e.target.value)}
-                            className="border-border focus:border-nova-pink"
-                          />
-                        </div>
+                      {/* Token Limit Editor */}
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-medium text-foreground">Token Limits</h3>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div>
+                            <Label className="text-sm font-medium text-foreground mb-1 block">Max Tokens per Day</Label>
+                            <Input 
+                              type="number" 
+                              value={maxTokensDay} 
+                              onChange={(e) => setMaxTokensDay(e.target.value)}
+                              className="border-border focus:border-nova-pink"
+                            />
+                          </div>
                         <div>
                           <Label className="text-sm font-medium text-foreground mb-1 block">Max Tokens per Month</Label>
                           <Input 
