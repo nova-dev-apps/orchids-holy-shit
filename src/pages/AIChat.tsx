@@ -570,51 +570,58 @@ const AIChat = () => {
                       )}
                     </div>
                       ) : (
-                          // AI Message
-                          <div className="w-full animate-blur-in flex flex-col gap-2">
-                            <div className="flex items-center gap-2 mb-1">
-                              {isAutoMode ? (
-                                <>
-                                  <span className="text-lg" style={{ filter: 'grayscale(100%)' }}>🛠️</span>
-                                  {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && (
-                                    <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
+                            // AI Message
+                            <div className="w-full animate-blur-in flex flex-col gap-2">
+                              {/* Thinking / Automating Indicator - Only show when no text has appeared yet */}
+                              {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && !msg.text && (
+                                <div className="flex items-center gap-2 mb-1">
+                                  {isAutoMode ? (
+                                    <>
+                                      <span className="text-lg" style={{ filter: 'grayscale(100%)' }}>🛠️</span>
+                                      <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Brain size={16} className="animate-pulse text-blue-500" />
+                                      <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
+                                    </>
                                   )}
-                                </>
-                              ) : (
-                                <>
-                                  <Brain size={16} className={`${isThinking && msg.id === currentMessages[currentMessages.length - 1].id ? 'animate-pulse text-blue-500' : 'text-gray-400'}`} />
-                                  {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && (
-                                    <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
-                                  )}
-                                </>
+                                </div>
+                              )}
+                              
+                              {/* Message Text */}
+                              {msg.text && (
+                                <div className="text-black text-base leading-relaxed max-w-[85%] whitespace-pre-wrap break-words">
+                                  {msg.text}
+                                </div>
+                              )}
+
+                              {/* Action Buttons - Only show when response is finished */}
+                              {(!isThinking || msg.id !== currentMessages[currentMessages.length - 1].id) && msg.text && (
+                                <div className="flex items-center gap-1 mt-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-gray-400 hover:text-black hover:bg-gray-100"
+                                    onClick={() => handleCopy(msg.text, msg.id)}
+                                  >
+                                    {copiedMessageId === msg.id ? (
+                                      <Check className="h-4 w-4 text-green-500" />
+                                    ) : (
+                                      <Copy className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-gray-400 hover:text-black hover:bg-gray-100"
+                                    onClick={() => handleRegenerate(msg.id)}
+                                  >
+                                    <RefreshCw className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               )}
                             </div>
-                            <div className="text-black text-base leading-relaxed max-w-[85%] whitespace-pre-wrap break-words">
-                              {msg.text}
-                            </div>
-                          <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-black hover:bg-gray-100"
-                            onClick={() => handleCopy(msg.text, msg.id)}
-                          >
-                            {copiedMessageId === msg.id ? (
-                              <Check className="h-4 w-4 text-green-500" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-gray-400 hover:text-black hover:bg-gray-100"
-                              onClick={() => handleRegenerate(msg.id)}
-                            >
-                              <RefreshCw className="h-4 w-4" />
-                            </Button>
-                        </div>
-                      </div>
                     )}
 
                 </div>
