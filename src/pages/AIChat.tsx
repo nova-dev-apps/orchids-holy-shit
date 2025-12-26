@@ -427,50 +427,57 @@ const AIChat = () => {
           [activeTab]: prev[activeTab].slice(0, lastUserIndex + 1)
         }));
         
-        setIsThinking(true);
-  
-        const aiResponseId = (Date.now() + 1).toString();
-        
-        // Add initial empty AI message immediately
-        setContentState(prev => ({
-          ...prev,
-          [activeTab]: [...prev[activeTab], {
-            id: aiResponseId,
-            text: "",
-            isUser: false,
-            timestamp: new Date()
-          }]
-        }));
+          setIsThinking(true);
+    
+          const aiResponseId = (Date.now() + 1).toString();
+          
+          // Abort any existing request
+          if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+          }
+          abortControllerRef.current = new AbortController();
 
-          // If AI config is available, use real API
-          if (apiConfig?.api_key && apiConfig?.endpoint_url) {
-            try {
-                const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
-                const url = cleanUrl.toLowerCase().includes('/chat/completions') 
-                  ? cleanUrl 
-                  : `${cleanUrl}/chat/completions`;
+          // Add initial empty AI message immediately
+          setContentState(prev => ({
+            ...prev,
+            [activeTab]: [...prev[activeTab], {
+              id: aiResponseId,
+              text: "",
+              isUser: false,
+              timestamp: new Date()
+            }]
+          }));
 
-                const model = apiConfig.model?.trim() || "gpt-4o";
+            // If AI config is available, use real API
+            if (apiConfig?.api_key && apiConfig?.endpoint_url) {
+              try {
+                  const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
+                  const url = cleanUrl.toLowerCase().includes('/chat/completions') 
+                    ? cleanUrl 
+                    : `${cleanUrl}/chat/completions`;
+
+                  const model = apiConfig.model?.trim() || "gpt-4o";
 
 
-                const response = await fetch(url, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiConfig.api_key.trim()}`
-                  },
-                  body: JSON.stringify({
-                    model,
-                    messages: [
-                      ...messages.slice(0, lastUserIndex).map(m => ({
-                        role: m.isUser ? "user" : "assistant",
-                        content: m.text
-                      })),
-                      { role: "user", content: lastUserMessage.text }
-                    ],
-                    stream: true
-                  })
-                });
+                  const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${apiConfig.api_key.trim()}`
+                    },
+                    body: JSON.stringify({
+                      model,
+                      messages: [
+                        ...messages.slice(0, lastUserIndex).map(m => ({
+                          role: m.isUser ? "user" : "assistant",
+                          content: m.text
+                        })),
+                        { role: "user", content: lastUserMessage.text }
+                      ],
+                      stream: true
+                    }),
+                    signal: abortControllerRef.current.signal
+                  });
 
             if (!response.ok) {
               const errorData = await response.json().catch(() => ({}));
