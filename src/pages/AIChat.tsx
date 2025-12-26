@@ -361,13 +361,13 @@ const AIChat = () => {
           // If AI config is available, use real API
           if (apiConfig?.api_key && apiConfig?.endpoint_url) {
             try {
-              const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
-              const url = cleanUrl.toLowerCase().endsWith('/chat/completions') 
-                ? cleanUrl 
-                : `${cleanUrl}/chat/completions`;
+                const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
+                const url = cleanUrl.toLowerCase().includes('/chat/completions') 
+                  ? cleanUrl 
+                  : `${cleanUrl}/chat/completions`;
 
-              const rawModel = apiConfig.model?.trim() || "gpt-4o";
-              const model = rawModel.includes('/') ? rawModel.split('/').pop() : rawModel;
+                const model = apiConfig.model?.trim() || "gpt-4o";
+
 
               const response = await fetch(url, {
                 method: 'POST',
