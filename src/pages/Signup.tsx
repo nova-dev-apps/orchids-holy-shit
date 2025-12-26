@@ -230,16 +230,16 @@ const Signup = () => {
                 </ul>
               </div>
 
-              <div>
-                <h3 className="font-semibold mb-2">6. Limitation of Liability (The "Shield" Clause)</h3>
-                <p className="font-medium">TO THE MAXIMUM EXTENT PERMITTED BY LAW, NOVA SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li>Loss of data or corrupted files.</li>
-                  <li>Software crashes or OS instability.</li>
-                  <li>Actions taken by the AI that violate third-party terms of service.</li>
-                </ul>
-                <p className="mt-2"><strong>Maximum Cap:</strong> In any event, Nova’s total liability to you shall not exceed the amount you paid for the current month’s subscription ($135).</p>
-              </div>
+                <div>
+                  <h3 className="font-semibold mb-2">6. Limitation of Liability (The "Shield" Clause)</h3>
+                  <p className="font-medium uppercase">TO THE MAXIMUM EXTENT PERMITTED BY LAW, NOVA SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
+                  <ul className="list-disc pl-5 mt-2 space-y-1">
+                    <li>Loss of data or corrupted files.</li>
+                    <li>Software crashes or OS instability.</li>
+                    <li>Actions taken by the AI that violate third-party terms of service.</li>
+                  </ul>
+                  <p className="mt-2"><strong>Maximum Cap:</strong> In any event, Nova’s total liability to you shall not exceed the amount you paid for the current month’s subscription ($135).</p>
+                </div>
 
               <div>
                 <h3 className="font-semibold mb-2">7. Governing Law</h3>
