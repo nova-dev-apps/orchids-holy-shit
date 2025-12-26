@@ -31,9 +31,10 @@ interface ChatInputProps {
   onToggleStrictMode?: () => void;
   isAdmin?: boolean;
   onAutoModeToggle?: (isActive: boolean) => void;
+  isGenerating?: boolean;
 }
 
-export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, hideAttachments, activeTab, strictMode, onToggleStrictMode, isAdmin, onAutoModeToggle }: ChatInputProps) => {
+export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, hideAttachments, activeTab, strictMode, onToggleStrictMode, isAdmin, onAutoModeToggle, isGenerating }: ChatInputProps) => {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isAutoActive, setIsAutoActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
