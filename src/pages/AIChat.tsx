@@ -353,7 +353,7 @@ const AIChat = () => {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-gray-400 hover:text-black hover:bg-gray-100"
-                              onClick={handleRegenerate}
+                              onClick={() => handleRegenerate(msg.id)}
                             >
                               <RefreshCw className="h-4 w-4" />
                             </Button>
