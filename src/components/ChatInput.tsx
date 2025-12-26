@@ -221,13 +221,13 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
             style={{ height: 'auto' }}
             data-testid={isAutoActive ? 'textarea-auto-mode' : 'textarea-normal'}
           />
-            <button
-              onClick={handleSend}
-              disabled={(!message.trim() && attachments.length === 0) || disabled}
-              className="absolute right-4 p-0 flex items-center justify-center hover:opacity-70 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ top: 'calc(33.333% - 4px)' }}
-              aria-label={isGenerating ? "Stop generation" : "Send message"}
-            >
+              <button
+                onClick={isGenerating ? onStop : handleSend}
+                disabled={!isGenerating && (!message.trim() && attachments.length === 0 || disabled)}
+                className="absolute right-4 p-0 flex items-center justify-center hover:opacity-70 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ top: 'calc(33.333% - 4px)' }}
+                aria-label={isGenerating ? "Stop generation" : "Send message"}
+              >
               {isGenerating ? (
                 <Square className="w-5 h-5 text-red-600 fill-red-600" />
               ) : (
