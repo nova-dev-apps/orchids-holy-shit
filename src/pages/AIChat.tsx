@@ -292,10 +292,11 @@ const AIChat = () => {
               hideAttachments={false}
               activeTab={activeTab}
               strictMode={strictMode}
-              onToggleStrictMode={() => setStrictMode(!strictMode)}
-              isAdmin={isAdmin}
-              onAutoModeToggle={setIsAutoMode}
-            />
+                onToggleStrictMode={() => setStrictMode(!strictMode)}
+                isAdmin={isAdmin}
+                onAutoModeToggle={setIsAutoMode}
+                isGenerating={isThinking}
+              />
           </div>
         </div>
       </div>
