@@ -181,11 +181,34 @@ const AIChat = () => {
   };
 
   const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+
     if (aiTimeoutRef.current) {
       clearTimeout(aiTimeoutRef.current);
       aiTimeoutRef.current = null;
-      setIsThinking(false);
+    }
 
+    setIsThinking(false);
+
+    const lastMessages = contentState[activeTab];
+    const lastMsg = lastMessages[lastMessages.length - 1];
+
+    if (lastMsg && !lastMsg.isUser && !lastMsg.text) {
+      // If we stop and the AI hasn't sent any text yet, update the empty message
+      setContentState(prev => {
+        const activeMessages = prev[activeTab];
+        const newMessages = [...activeMessages];
+        newMessages[newMessages.length - 1] = { 
+          ...newMessages[newMessages.length - 1], 
+          text: "the response was stopped" 
+        };
+        return { ...prev, [activeTab]: newMessages };
+      });
+    } else {
+      // If it already started speaking or something else, append a new message or just stop
       const stoppedMessage: Message = {
         id: (Date.now() + 2).toString(),
         text: "the response was stopped",
@@ -202,6 +225,12 @@ const AIChat = () => {
 
   const handleSendMessage = async (messageText: string, attachments: Attachment[]) => {
     if (messageText.trim() || attachments.length > 0) {
+      // Abort any existing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+
       const newMessage: Message = {
         id: Date.now().toString(),
         text: messageText,
@@ -234,13 +263,11 @@ const AIChat = () => {
       if (apiConfig?.api_key && apiConfig?.endpoint_url) {
         try {
             const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
-            // More robust check to prevent double appending
             const url = cleanUrl.toLowerCase().includes('/chat/completions') 
               ? cleanUrl 
               : `${cleanUrl}/chat/completions`;
             
             const model = apiConfig.model?.trim() || "gpt-4o";
-            // Stop stripping prefix as many providers (OpenRouter, Mistral) need it
             
             const response = await fetch(url, {
               method: 'POST',
@@ -258,7 +285,8 @@ const AIChat = () => {
                   { role: "user", content: messageText }
                 ],
                 stream: true
-              })
+              }),
+              signal: abortControllerRef.current.signal
             });
 
             if (!response.ok) {
