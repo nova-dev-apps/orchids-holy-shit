@@ -226,7 +226,7 @@ const AIChat = () => {
               'Authorization': `Bearer ${apiConfig.api_key}`
             },
             body: JSON.stringify({
-              model: "gpt-4o", // Default model, ideally should be configurable
+              model: apiConfig.model || "gpt-4o",
               messages: [
                 ...contentState[activeTab].map(m => ({
                   role: m.isUser ? "user" : "assistant",
