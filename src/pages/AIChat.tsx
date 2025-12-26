@@ -220,12 +220,13 @@ const AIChat = () => {
       if (apiConfig?.api_key && apiConfig?.endpoint_url) {
         try {
             const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
-            const url = cleanUrl.toLowerCase().endsWith('/chat/completions') 
+            // More robust check to prevent double appending
+            const url = cleanUrl.toLowerCase().includes('/chat/completions') 
               ? cleanUrl 
               : `${cleanUrl}/chat/completions`;
             
-            const rawModel = apiConfig.model?.trim() || "gpt-4o";
-            const model = rawModel.includes('/') ? rawModel.split('/').pop() : rawModel;
+            const model = apiConfig.model?.trim() || "gpt-4o";
+            // Stop stripping prefix as many providers (OpenRouter, Mistral) need it
             
             const response = await fetch(url, {
               method: 'POST',
