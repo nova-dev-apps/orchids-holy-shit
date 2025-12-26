@@ -217,18 +217,36 @@ const AIChat = () => {
 
   const handleRegenerate = () => {
     const messages = contentState[activeTab];
-    const lastUserMessage = [...messages].reverse().find(m => m.isUser);
+    const lastUserIndex = [...messages].reverse().findIndex(m => m.isUser);
     
-    if (lastUserMessage) {
-      // Optional: remove last AI message if it's the latest
-      const lastMessage = messages[messages.length - 1];
-      if (!lastMessage.isUser) {
+    if (lastUserIndex !== -1) {
+      const actualLastUserIndex = messages.length - 1 - lastUserIndex;
+      const lastUserMessage = messages[actualLastUserIndex];
+      
+      // Remove everything after the last user message to "regenerate on the same spot"
+      setContentState(prev => ({
+        ...prev,
+        [activeTab]: prev[activeTab].slice(0, actualLastUserIndex + 1)
+      }));
+      
+      setIsThinking(true);
+
+      // Simulate AI response after a delay
+      aiTimeoutRef.current = setTimeout(() => {
+        setIsThinking(false);
+        aiTimeoutRef.current = null;
+        const aiResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          text: `AI response for ${activeTab}: ${lastUserMessage.text || 'Received your attachments'}`,
+          isUser: false,
+          timestamp: new Date()
+        };
+
         setContentState(prev => ({
           ...prev,
-          [activeTab]: prev[activeTab].slice(0, -1)
+          [activeTab]: [...prev[activeTab], aiResponse]
         }));
-      }
-      handleSendMessage(lastUserMessage.text, lastUserMessage.attachments || []);
+      }, 2000);
     }
   };
 
