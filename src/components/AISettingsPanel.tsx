@@ -28,9 +28,6 @@ interface TokenLimits {
 }
 
 const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStrictMode, isAdmin }: AISettingsPanelProps) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [activeSection, setActiveSection] = useState<'chatbot' | 'automation'>('chatbot');
-  
   // Chat settings
   const [chatSettings, setChatSettings] = useState<ChatSettings>({
     customInstructions: "",
