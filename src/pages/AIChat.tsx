@@ -227,24 +227,23 @@ const AIChat = () => {
         attachments: attachments.length > 0 ? attachments : undefined
       };
 
-      setContentState(prev => ({
-        ...prev,
-        [activeTab]: [...prev[activeTab], newMessage]
-      }));
-      
-      setIsThinking(true);
-
       const aiResponseId = (Date.now() + 1).toString();
       
-      // Add initial empty AI message immediately to show thinking indicator
+      setIsThinking(true);
+      
+      // Add user message and initial empty AI message together for immediate visibility
       setContentState(prev => ({
         ...prev,
-        [activeTab]: [...prev[activeTab], {
-          id: aiResponseId,
-          text: "",
-          isUser: false,
-          timestamp: new Date()
-        }]
+        [activeTab]: [
+          ...prev[activeTab], 
+          newMessage,
+          {
+            id: aiResponseId,
+            text: "",
+            isUser: false,
+            timestamp: new Date()
+          }
+        ]
       }));
 
       // If AI config is available, use real API
