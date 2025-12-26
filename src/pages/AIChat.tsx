@@ -569,13 +569,30 @@ const AIChat = () => {
                         </div>
                       )}
                     </div>
-                    ) : (
-                        // AI Message
-                        <div className="w-full animate-blur-in flex flex-col gap-2">
-                          <div className="text-black text-base leading-relaxed max-w-[85%] whitespace-pre-wrap break-words">
-                            {msg.text}
-                          </div>
-                        <div className="flex items-center gap-1">
+                      ) : (
+                          // AI Message
+                          <div className="w-full animate-blur-in flex flex-col gap-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              {isAutoMode ? (
+                                <>
+                                  <span className="text-lg" style={{ filter: 'grayscale(100%)' }}>🛠️</span>
+                                  {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && (
+                                    <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <Brain size={16} className={`${isThinking && msg.id === currentMessages[currentMessages.length - 1].id ? 'animate-pulse text-blue-500' : 'text-gray-400'}`} />
+                                  {isThinking && msg.id === currentMessages[currentMessages.length - 1].id && (
+                                    <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                            <div className="text-black text-base leading-relaxed max-w-[85%] whitespace-pre-wrap break-words">
+                              {msg.text}
+                            </div>
+                          <div className="flex items-center gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
