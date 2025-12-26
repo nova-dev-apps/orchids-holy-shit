@@ -410,18 +410,11 @@ const AIChat = () => {
       }
     }
     
-      if (lastUserIndex !== -1) {
-        const lastUserMessage = messages[lastUserIndex];
-        
-        // Remove everything from the target message onwards
-        setContentState(prev => ({
-          ...prev,
-          [activeTab]: prev[activeTab].slice(0, lastUserIndex + 1)
-        }));
-        
-          setIsThinking(true);
-    
+        if (lastUserIndex !== -1) {
+          const lastUserMessage = messages[lastUserIndex];
           const aiResponseId = (Date.now() + 1).toString();
+
+          setIsThinking(true);
           
           // Abort any existing request
           if (abortControllerRef.current) {
@@ -429,18 +422,21 @@ const AIChat = () => {
           }
           abortControllerRef.current = new AbortController();
 
-          // Add initial empty AI message immediately
+          // Remove everything from the target message onwards and add initial empty AI message together
           setContentState(prev => ({
             ...prev,
-            [activeTab]: [...prev[activeTab], {
-              id: aiResponseId,
-              text: "",
-              isUser: false,
-              timestamp: new Date()
-            }]
+            [activeTab]: [
+              ...prev[activeTab].slice(0, lastUserIndex + 1),
+              {
+                id: aiResponseId,
+                text: "",
+                isUser: false,
+                timestamp: new Date()
+              }
+            ]
           }));
 
-            // If AI config is available, use real API
+          // If AI config is available, use real API
             if (apiConfig?.api_key && apiConfig?.endpoint_url) {
               try {
                   const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
