@@ -184,19 +184,19 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                 </DropdownMenuItem>
               )}
                         {activeTab === 'chat' && (
-                          <DropdownMenuItem
-                            onClick={() => {
-                              if (isMobileDevice()) {
-                                toast({
-                                  title: "Desktop only",
-                                  description: "The local agent is only available for desktop.",
-                                  variant: "default",
-                                  duration: 3000,
-                                });
-                                return;
-                              }
-                              
-                              const ps1Content = `# Nova Agent One-Click Installer
+                            <DropdownMenuItem
+                              onClick={() => {
+                                if (isMobileDevice()) {
+                                  toast({
+                                    title: "Desktop only",
+                                    description: "The local agent is only available for desktop.",
+                                    variant: "default",
+                                    duration: 3000,
+                                  });
+                                  return;
+                                }
+                                
+                                const ps1Content = `# Nova Agent One-Click Installer
 $ErrorActionPreference = "Stop"
 Write-Host "Nova Agent Installer" -ForegroundColor Cyan
 try {
@@ -300,37 +300,50 @@ if (Test-Path "$d\\dist\\NovaAgent.exe") {
 } else { Write-Host "Build failed" -ForegroundColor Red }
 Remove-Item $d -Recurse -Force -EA SilentlyContinue
 `;
-                              
-                              const blob = new Blob([ps1Content], { type: 'application/octet-stream' });
-                              const url = URL.createObjectURL(blob);
-                              
-                              const a = document.createElement('a');
-                              a.style.display = 'none';
-                              a.href = url;
-                              a.download = 'Install-NovaAgent.ps1';
-                              
-                              document.body.appendChild(a);
-                              
-                              setTimeout(() => {
-                                a.click();
-                                setTimeout(() => {
-                                  document.body.removeChild(a);
-                                  URL.revokeObjectURL(url);
-                                }, 100);
-                              }, 0);
-                              
-                              toast({
-                                title: "Downloaded!",
-                                description: "Right-click the file → Run with PowerShell",
-                                duration: 6000,
-                              });
-                            }}
-                            className="flex items-center gap-2 cursor-pointer"
-                          >
-                            <Download className="w-4 h-4 text-nova-pink" />
-                            <span className="font-medium">Download Agent</span>
-                          </DropdownMenuItem>
-                        )}
+                                
+                                // Use postMessage to open in external tab (works in iframe)
+                                const dataUri = 'data:application/octet-stream;base64,' + btoa(unescape(encodeURIComponent(ps1Content)));
+                                
+                                // Method: Open new tab with data URI, triggers download
+                                window.parent.postMessage({ 
+                                  type: "OPEN_EXTERNAL_URL", 
+                                  data: { url: dataUri } 
+                                }, "*");
+                                
+                                // Fallback: Also try direct window.open
+                                const newTab = window.open('', '_blank');
+                                if (newTab) {
+                                  newTab.document.write(`
+                                    <html><head><title>Download</title></head><body>
+                                    <script>
+                                      const content = ${JSON.stringify(ps1Content)};
+                                      const blob = new Blob([content], {type: 'application/octet-stream'});
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement('a');
+                                      a.href = url;
+                                      a.download = 'Install-NovaAgent.ps1';
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      setTimeout(() => window.close(), 1000);
+                                    </script>
+                                    <p>Downloading... This tab will close automatically.</p>
+                                    </body></html>
+                                  `);
+                                  newTab.document.close();
+                                }
+                                
+                                toast({
+                                  title: "Downloading...",
+                                  description: "Right-click file → Run with PowerShell",
+                                  duration: 6000,
+                                });
+                              }}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Download className="w-4 h-4 text-nova-pink" />
+                              <span className="font-medium">Download Agent</span>
+                            </DropdownMenuItem>
+                          )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
