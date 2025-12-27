@@ -628,7 +628,7 @@ const AIChat = () => {
                                                                   className="absolute" 
                                                                   style={{ 
                                                                     color: 'black', 
-                                                                    transform: 'rotate(-30deg)'
+                                                                    transform: 'rotate(-45deg)'
                                                                   }} 
                                                                 />
                                                                 <Hammer 
@@ -636,7 +636,7 @@ const AIChat = () => {
                                                                   className="absolute" 
                                                                   style={{ 
                                                                     color: 'black', 
-                                                                    transform: 'rotate(30deg)'
+                                                                    transform: 'rotate(45deg)'
                                                                   }} 
                                                                 />
                                                       </div>
