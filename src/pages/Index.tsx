@@ -8,7 +8,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 pt-8 pb-6 max-w-6xl mx-auto">
+      <header className="flex items-center justify-center px-6 pt-8 pb-6 max-w-6xl mx-auto">
         <NovaLogoSvg className="h-12 w-auto" />
       </header>
 
