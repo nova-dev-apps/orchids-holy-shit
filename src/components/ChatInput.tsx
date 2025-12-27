@@ -196,14 +196,50 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                               return;
                             }
                             
-                            // Open external URL for the agent download page
-                            window.parent.postMessage({ 
-                              type: "OPEN_EXTERNAL_URL", 
-                              data: { url: "https://github.com/user/nova-agent/releases" } 
-                            }, "*");
-                            
-                            // Also provide inline download as fallback
-                            const pyContent = `import json
+                      // Download one-click installer PowerShell script
+                              const ps1Content = `# Nova Agent Installer for Windows
+# Run this script in PowerShell to automatically install NovaAgent.exe
+
+$ErrorActionPreference = "Stop"
+
+Write-Host "==========================================" -ForegroundColor Cyan
+Write-Host "     Nova Agent Installer for Windows    " -ForegroundColor Cyan
+Write-Host "==========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# Check if Python is installed
+$pythonPath = $null
+try {
+    $pythonPath = (Get-Command python -ErrorAction SilentlyContinue).Source
+    $pythonVersion = python --version 2>&1
+    Write-Host "[OK] Python found: $pythonVersion" -ForegroundColor Green
+} catch {
+    Write-Host "[!] Python not found. Installing..." -ForegroundColor Yellow
+    $installerUrl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
+    $installerPath = "$env:TEMP\\python-installer.exe"
+    Write-Host "    Downloading Python..." -ForegroundColor Gray
+    Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+    Write-Host "    Installing Python..." -ForegroundColor Gray
+    Start-Process -FilePath $installerPath -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1 Include_test=0" -Wait
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    Write-Host "[OK] Python installed!" -ForegroundColor Green
+}
+
+$buildDir = "$env:TEMP\\nova-agent-build"
+if (Test-Path $buildDir) { Remove-Item -Recurse -Force $buildDir }
+New-Item -ItemType Directory -Path $buildDir | Out-Null
+
+Write-Host ""
+Write-Host "[*] Installing dependencies..." -ForegroundColor Cyan
+python -m pip install --upgrade pip --quiet 2>$null
+python -m pip install pyinstaller pyperclip --quiet 2>$null
+Write-Host "[OK] Dependencies installed!" -ForegroundColor Green
+
+Write-Host ""
+Write-Host "[*] Creating Nova Agent script..." -ForegroundColor Cyan
+`;
+
+                              const pyContent = `import json
 import os
 import subprocess
 import threading
