@@ -540,11 +540,11 @@ const AIChat = () => {
                         body: JSON.stringify({
                           model,
                           messages: [
-                            ...messages.slice(0, lastUserIndex).slice(-6).map(m => ({
+                            ...messages.slice(0, lastUserIndex).slice(-10).map(m => ({
                               role: m.isUser ? "user" : "assistant",
-                              content: m.text
+                              content: m.text.substring(0, 4000)
                             })),
-                            { role: "user", content: lastUserMessage.text }
+                            { role: "user", content: lastUserMessage.text.substring(0, 4000) }
                           ],
                           stream: true
                         }),
