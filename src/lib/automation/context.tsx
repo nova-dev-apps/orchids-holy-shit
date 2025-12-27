@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { AutomationState, AutomationPlan, AutomationTask, AgentStatus, ExecutionLog, TaskStatus } from './types';
+import { supabase } from '@/lib/supabase';
 
 interface AutomationContextType extends AutomationState {
   enableAutomation: () => void;
@@ -10,17 +11,16 @@ interface AutomationContextType extends AutomationState {
   stopExecution: () => void;
   updateTaskStatus: (taskId: string, status: TaskStatus, error?: string) => void;
   clearHistory: () => void;
+  loadHistory: () => Promise<void>;
 }
 
 const AutomationContext = createContext<AutomationContextType | null>(null);
 
-const STORAGE_KEY = 'nova_automation_state';
 const CONSENT_KEY = 'nova_automation_consent';
 
 export function AutomationProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AutomationState>(() => {
     const savedConsent = localStorage.getItem(CONSENT_KEY) === 'true';
-    const savedHistory = localStorage.getItem('nova_execution_history');
     
     return {
       isEnabled: false,
@@ -32,15 +32,44 @@ export function AutomationProvider({ children }: { children: ReactNode }) {
         version: '1.0.0',
       },
       currentPlan: null,
-      executionHistory: savedHistory ? JSON.parse(savedHistory) : [],
+      executionHistory: [],
     };
   });
 
   const [executionInterval, setExecutionInterval] = useState<NodeJS.Timeout | null>(null);
 
+  const loadHistory = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('execution_history')
+        .select('*')
+        .order('executed_at', { ascending: false })
+        .limit(50);
+      
+      if (error) throw error;
+      
+      if (data) {
+        const history: ExecutionLog[] = data.map(row => ({
+          id: row.id,
+          planId: row.plan_id,
+          planTitle: row.plan_title,
+          status: row.status as 'completed' | 'failed' | 'cancelled',
+          tasksCompleted: row.tasks_completed,
+          totalTasks: row.total_tasks,
+          executedAt: new Date(row.executed_at),
+          duration: row.duration,
+          error: row.error || undefined,
+        }));
+        setState(prev => ({ ...prev, executionHistory: history }));
+      }
+    } catch (err) {
+      console.error('Failed to load execution history:', err);
+    }
+  }, []);
+
   useEffect(() => {
-    localStorage.setItem('nova_execution_history', JSON.stringify(state.executionHistory));
-  }, [state.executionHistory]);
+    loadHistory();
+  }, [loadHistory]);
 
   useEffect(() => {
     if (state.hasConsent) {
