@@ -798,18 +798,22 @@ const AIChat = () => {
             </div>
           ) : (
             <div className="space-y-6 max-w-4xl mx-auto">
-              {currentMessages.map((msg, index) => (
-                <ChatMessage 
-                  key={msg.id}
-                  msg={msg}
-                  isThinking={isThinking}
-                  isAutoMode={isAutoMode}
-                  isLast={index === currentMessages.length - 1}
-                  copiedMessageId={copiedMessageId}
-                  handleCopy={handleCopy}
-                  handleRegenerate={handleRegenerate}
-                />
-              ))}
+                {currentMessages.map((msg, index) => (
+                  <ChatMessage 
+                    key={msg.id}
+                    msg={msg}
+                    isThinking={isThinking}
+                    isAutoMode={isAutoMode}
+                    isLast={index === currentMessages.length - 1}
+                    copiedMessageId={copiedMessageId}
+                    handleCopy={handleCopy}
+                    handleRegenerate={handleRegenerate}
+                    currentPlan={currentPlan}
+                    isExecutingAutomation={isExecutingAutomation}
+                    setIsExecutingAutomation={setIsExecutingAutomation}
+                  />
+                ))}
+
               
               <div ref={messagesEndRef} />
             </div>
