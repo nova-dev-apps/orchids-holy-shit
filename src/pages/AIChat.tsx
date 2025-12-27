@@ -187,9 +187,6 @@ const AIChat = () => {
 
   const fetchAiConfig = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      // Fetch Global Config
       const { data: globalData, error: globalError } = await supabase
         .from('ai_config')
         .select('api_key, endpoint_url, model, custom_instructions')
@@ -198,19 +195,7 @@ const AIChat = () => {
       
       if (globalError) throw globalError;
       
-      let personalInstructions = "";
-      if (user) {
-        // Fetch User Personal Instructions
-        const { data: userData } = await supabase
-          .from('ai_config')
-          .select('custom_instructions')
-          .eq('id', user.id)
-          .maybeSingle();
-        
-        if (userData?.custom_instructions) {
-          personalInstructions = userData.custom_instructions;
-        }
-      }
+      const personalInstructions = localStorage.getItem("nova_personal_instructions") || "";
 
       if (globalData) {
         setApiConfig({
