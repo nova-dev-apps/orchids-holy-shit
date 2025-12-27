@@ -217,9 +217,9 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <Download className="w-4 h-4 text-nova-pink" />
-                    <div className="flex flex-col">
-                      <span className="font-medium">Download Agent</span>
-                    </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium">Download Agent</span>
+                      </div>
                   </DropdownMenuItem>
                 )}
 
