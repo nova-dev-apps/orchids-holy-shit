@@ -322,25 +322,26 @@ const AIChat = () => {
             
             const model = apiConfig.model?.trim() || "gpt-4o";
             
-            const response = await fetch(url, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiConfig.api_key.trim()}`
-              },
-                body: JSON.stringify({
-                  model,
-                        messages: [
-                          ...contentState[activeTab].slice(-10).map(m => ({
-                            role: m.isUser ? "user" : "assistant",
-                            content: m.text.substring(0, 4000)
-                          })),
-                          { role: "user", content: messageText.substring(0, 4000) }
-                        ],
-                    stream: true
-                  }),
-                signal: abortControllerRef.current.signal
-              });
+const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${apiConfig.api_key.trim()}`
+                },
+                  body: JSON.stringify({
+                    model,
+                          messages: [
+                            ...(apiConfig.custom_instructions ? [{ role: "system", content: apiConfig.custom_instructions }] : []),
+                            ...contentState[activeTab].slice(-10).map(m => ({
+                              role: m.isUser ? "user" : "assistant",
+                              content: m.text.substring(0, 4000)
+                            })),
+                            { role: "user", content: messageText.substring(0, 4000) }
+                          ],
+                      stream: true
+                    }),
+                  signal: abortControllerRef.current.signal
+                });
 
               if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
