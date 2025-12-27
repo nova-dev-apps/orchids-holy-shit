@@ -183,47 +183,77 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                   {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
                 </DropdownMenuItem>
               )}
-                  {activeTab === 'chat' && (
-                    <DropdownMenuItem
-                      onClick={() => {
-                        if (isMobileDevice()) {
-                          toast({
-                            title: "Desktop only",
-                            description: "The local agent is only available for desktop.",
-                            variant: "default",
-                            duration: 3000,
-                          });
-                          return;
-                        }
-                        
-                        // Open files in new tabs using postMessage for iframe compatibility
-                        window.parent.postMessage({ 
-                          type: "OPEN_EXTERNAL_URL", 
-                          data: { url: window.location.origin + '/nova-agent.py' } 
-                        }, "*");
-                        
-                        setTimeout(() => {
-                          window.parent.postMessage({ 
-                            type: "OPEN_EXTERNAL_URL", 
-                            data: { url: window.location.origin + '/build-nova-agent.bat' } 
-                          }, "*");
-                        }, 500);
+                    {activeTab === 'chat' && (
+                      <DropdownMenuItem
+                        onClick={async () => {
+                          if (isMobileDevice()) {
+                            toast({
+                              title: "Desktop only",
+                              description: "The local agent is only available for desktop.",
+                              variant: "default",
+                              duration: 3000,
+                            });
+                            return;
+                          }
                           
-                        toast({
-                          title: "Opening files...",
-                          description: "Save both files, then run build-nova-agent.bat to create NovaAgent.exe",
-                          variant: "default",
-                          duration: 6000,
-                        });
-                      }}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <Download className="w-4 h-4 text-nova-pink" />
-                      <div className="flex flex-col">
-                        <span className="font-medium">Download Agent</span>
-                      </div>
-                    </DropdownMenuItem>
-                  )}
+                          try {
+                            // Fetch both files and trigger downloads
+                            const [pyRes, batRes] = await Promise.all([
+                              fetch('/nova-agent.py'),
+                              fetch('/build-nova-agent.bat')
+                            ]);
+                            
+                            if (!pyRes.ok || !batRes.ok) {
+                              throw new Error('Failed to fetch files');
+                            }
+                            
+                            const pyBlob = await pyRes.blob();
+                            const batBlob = await batRes.blob();
+                            
+                            // Download Python file
+                            const pyUrl = URL.createObjectURL(pyBlob);
+                            const pyLink = document.createElement('a');
+                            pyLink.href = pyUrl;
+                            pyLink.download = 'nova-agent.py';
+                            document.body.appendChild(pyLink);
+                            pyLink.click();
+                            document.body.removeChild(pyLink);
+                            URL.revokeObjectURL(pyUrl);
+                            
+                            // Download BAT file after short delay
+                            setTimeout(() => {
+                              const batUrl = URL.createObjectURL(batBlob);
+                              const batLink = document.createElement('a');
+                              batLink.href = batUrl;
+                              batLink.download = 'build-nova-agent.bat';
+                              document.body.appendChild(batLink);
+                              batLink.click();
+                              document.body.removeChild(batLink);
+                              URL.revokeObjectURL(batUrl);
+                            }, 300);
+                            
+                            toast({
+                              title: "Downloaded!",
+                              description: "Put both files in the same folder, then run build-nova-agent.bat",
+                              variant: "default",
+                              duration: 5000,
+                            });
+                          } catch (error) {
+                            toast({
+                              title: "Download failed",
+                              description: "Could not download agent files",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <Download className="w-4 h-4 text-nova-pink" />
+                        <div className="flex flex-col">
+                          <span className="font-medium">Download Agent</span>
+                        </div>
+                      </DropdownMenuItem>
+                    )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
