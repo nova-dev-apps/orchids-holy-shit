@@ -290,13 +290,16 @@ const AIChat = () => {
             // We already added the empty message above, so we just use aiResponseId
             
             if (reader) {
+              let buffer = "";
               while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
 
-                const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split("\n");
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop() || ""; // Keep the last partial line in the buffer
                 
+                let chunkText = "";
                 for (const line of lines) {
                   const trimmedLine = line.trim();
                   if (!trimmedLine || !trimmedLine.startsWith("data: ")) continue;
@@ -308,21 +311,25 @@ const AIChat = () => {
                       const json = JSON.parse(data);
                       const content = json.choices[0]?.delta?.content || "";
                       if (content) {
-                        aiText += content;
-                        setContentState(prev => {
-                          const activeMessages = prev[activeTab];
-                          const lastMsg = activeMessages[activeMessages.length - 1];
-                          if (lastMsg.id === aiResponseId) {
-                            const newMessages = [...activeMessages];
-                            newMessages[newMessages.length - 1] = { ...lastMsg, text: aiText };
-                            return { ...prev, [activeTab]: newMessages };
-                          }
-                          return prev;
-                        });
+                        chunkText += content;
                       }
                     } catch (e) {
-                      // Ignore parsing errors for partial chunks
+                      // Ignore parsing errors for partial JSON
                     }
+                }
+
+                if (chunkText) {
+                  aiText += chunkText;
+                  setContentState(prev => {
+                    const activeMessages = prev[activeTab];
+                    const lastMsg = activeMessages[activeMessages.length - 1];
+                    if (lastMsg.id === aiResponseId) {
+                      const newMessages = [...activeMessages];
+                      newMessages[newMessages.length - 1] = { ...lastMsg, text: aiText };
+                      return { ...prev, [activeTab]: newMessages };
+                    }
+                    return prev;
+                  });
                 }
               }
             }
