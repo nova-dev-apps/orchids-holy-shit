@@ -183,36 +183,54 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                   {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
                 </DropdownMenuItem>
               )}
-                {activeTab === 'chat' && (
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  if (isMobileDevice()) {
-                                    toast({
-                                      title: "Desktop only",
-                                      description: "The local agent is only available for desktop.",
-                                      variant: "default",
-                                      duration: 3000,
-                                    });
-                                    return;
-                                  }
-                                  
-                                  window.parent.postMessage({ 
-                                    type: "OPEN_EXTERNAL_URL", 
-                                    data: { url: "/install-nova-agent.ps1" } 
-                                  }, "*");
-                                  
-                                  toast({
-                                    title: "Download started",
-                                    description: "Right-click file → Run with PowerShell",
-                                    duration: 6000,
-                                  });
-                                }}
-                                className="flex items-center gap-2 cursor-pointer"
-                              >
-                                <Download className="w-4 h-4 text-nova-pink" />
-                                <span className="font-medium">Download Agent</span>
-                              </DropdownMenuItem>
-                            )}
+  {activeTab === 'chat' && (
+                                <DropdownMenuItem
+                                  onClick={async () => {
+                                    if (isMobileDevice()) {
+                                      toast({
+                                        title: "Desktop only",
+                                        description: "The local agent is only available for desktop.",
+                                        variant: "default",
+                                        duration: 3000,
+                                      });
+                                      return;
+                                    }
+                                    
+                                    const exeUrl = "https://vbjdekmdadenwofprxyv.supabase.co/storage/v1/object/public/downloads/NovaAgent.exe";
+                                    
+                                    try {
+                                      const response = await fetch(exeUrl, { method: 'HEAD' });
+                                      if (response.ok) {
+                                        window.parent.postMessage({ 
+                                          type: "OPEN_EXTERNAL_URL", 
+                                          data: { url: exeUrl } 
+                                        }, "*");
+                                        toast({
+                                          title: "Downloading NovaAgent.exe",
+                                          description: "Run the exe to start the agent",
+                                          duration: 5000,
+                                        });
+                                      } else {
+                                        throw new Error("EXE not available");
+                                      }
+                                    } catch {
+                                      window.parent.postMessage({ 
+                                        type: "OPEN_EXTERNAL_URL", 
+                                        data: { url: "/install-nova-agent.ps1" } 
+                                      }, "*");
+                                      toast({
+                                        title: "Download started",
+                                        description: "Right-click file → Run with PowerShell to build EXE",
+                                        duration: 6000,
+                                      });
+                                    }
+                                  }}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Download className="w-4 h-4 text-nova-pink" />
+                                  <span className="font-medium">Download Agent</span>
+                                </DropdownMenuItem>
+                              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
