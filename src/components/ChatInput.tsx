@@ -183,35 +183,55 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                   {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
                 </DropdownMenuItem>
               )}
-                {activeTab === 'chat' && (
-                  <DropdownMenuItem
-                    onClick={() => {
-                      if (isMobileDevice()) {
-                        toast({
-                          title: "Desktop only",
-                          description: "The local agent is only available for desktop.",
-                          variant: "default",
-                          duration: 3000,
-                        });
-                        return;
-                      }
-                      const downloadUrl = window.location.origin + '/nova-agent-setup.exe';
-                      window.parent.postMessage({ type: "OPEN_EXTERNAL_URL", data: { url: downloadUrl } }, "*");
-                      toast({
-                        title: "Download started",
-                        description: "Nova Agent installer is downloading...",
-                        variant: "default",
-                        duration: 3000,
-                      });
-                    }}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <Download className="w-4 h-4 text-nova-pink" />
-                    <div className="flex flex-col">
-                      <span className="font-medium">Download Agent</span>
-                    </div>
-                  </DropdownMenuItem>
-                )}
+                  {activeTab === 'chat' && (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (isMobileDevice()) {
+                          toast({
+                            title: "Desktop only",
+                            description: "The local agent is only available for desktop.",
+                            variant: "default",
+                            duration: 3000,
+                          });
+                          return;
+                        }
+                        
+                        fetch('/nova-local-agent.html')
+                          .then(response => response.text())
+                          .then(html => {
+                            const blob = new Blob([html], { type: 'text/html' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'nova-local-agent.html';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                            toast({
+                              title: "Downloaded!",
+                              description: "Open nova-local-agent.html in your browser to run the agent.",
+                              variant: "default",
+                              duration: 5000,
+                            });
+                          })
+                          .catch(() => {
+                            toast({
+                              title: "Download failed",
+                              description: "Could not download the agent file.",
+                              variant: "destructive",
+                              duration: 3000,
+                            });
+                          });
+                      }}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Download className="w-4 h-4 text-nova-pink" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Download Agent</span>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
