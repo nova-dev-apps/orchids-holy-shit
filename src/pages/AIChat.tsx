@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, ArrowDown, Wrench, Hammer, Copy, RefreshCw, Check } from "lucide-react";
+import { Brain, ArrowDown, Wrench, Hammer, Copy, RefreshCw, Check, ClipboardCopy } from "lucide-react";
 import { ChatInput, Attachment } from "@/components/ChatInput";
 import AISettingsPanel from "@/components/AISettingsPanel";
 import UserSettingsPanel from "@/components/UserSettingsPanel";
