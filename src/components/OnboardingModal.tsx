@@ -15,18 +15,11 @@ interface OnboardingModalProps {
   onComplete: () => void;
 }
 
-export const OnboardingModal = ({ onComplete }: OnboardingModalProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [hasConsent, setHasConsent] = useState(false);
-
-  useEffect(() => {
-    const consent = localStorage.getItem("nova_automation_consent");
-    if (!consent) {
-      setIsOpen(true);
-    }
-  }, []);
-
-  const handleContinue = () => {
+  export const OnboardingModal = ({ onComplete }: OnboardingModalProps) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [hasConsent, setHasConsent] = useState(false);
+  
+    const handleContinue = () => {
     if (hasConsent) {
       localStorage.setItem("nova_automation_consent", "true");
       setIsOpen(false);
