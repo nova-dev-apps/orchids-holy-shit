@@ -458,14 +458,9 @@ const AIChat = () => {
     }
   };
 
-  const handleCopy = (text: string, id: string) => {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    
+  const handleCopy = async (text: string, id: string) => {
     try {
-      document.execCommand('copy');
+      await navigator.clipboard.writeText(text);
       setCopiedMessageId(id);
       toast.success("Copied to clipboard");
       setTimeout(() => setCopiedMessageId(null), 2000);
@@ -473,7 +468,6 @@ const AIChat = () => {
       console.error('Failed to copy text: ', err);
       toast.error("Failed to copy text");
     }
-    document.body.removeChild(textArea);
   };
 
   const handleRegenerate = async (targetId?: string) => {
