@@ -216,10 +216,14 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                     }}
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    <Download className="w-4 h-4" />
-                    <span>Download Agent</span>
+                    <Download className="w-4 h-4 text-nova-pink" />
+                    <div className="flex flex-col">
+                      <span className="font-medium">Download Agent</span>
+                      <span className="text-[10px] text-gray-400">Windows (.exe)</span>
+                    </div>
                   </DropdownMenuItem>
                 )}
+
               {isAdmin && onToggleStrictMode && (
                 <DropdownMenuItem
                   onClick={onToggleStrictMode}
