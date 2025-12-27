@@ -34,6 +34,7 @@ const AISettingsPanel = ({
   isAdmin: propIsAdmin 
 }: AISettingsPanelProps) => {
   const isAdmin = propIsAdmin || localStorage.getItem("isAdmin") === "true";
+  console.log("AISettingsPanel: isAdmin =", isAdmin, "propIsAdmin =", propIsAdmin);
   
   const [chatSettings, setChatSettings] = useState<ChatSettings>({
     customInstructions: ""
