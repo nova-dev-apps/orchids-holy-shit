@@ -154,11 +154,7 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
             </Button>
           </div>
         </div>
-      )}
-    </div>
-  );
-
-  const renderAutomationSettings = () => (
+      )} = () => (
     isAdmin && (
       <div className="space-y-6">
         <div>
