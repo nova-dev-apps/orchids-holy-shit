@@ -183,47 +183,47 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                   {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
                 </DropdownMenuItem>
               )}
-                {activeTab === 'chat' && (
-                  <DropdownMenuItem
-                    onClick={() => {
-                      if (isMobileDevice()) {
-                        toast({
-                          title: "Desktop only",
-                          description: "The local agent is only available for desktop.",
-                          variant: "default",
-                          duration: 3000,
-                        });
-                        return;
-                      }
-                      
-                      // Direct download links
-                        const pyLink = document.createElement('a');
-                        pyLink.href = '/nova-agent.py';
-                        pyLink.download = 'nova-agent.py';
-                        pyLink.click();
+                  {activeTab === 'chat' && (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (isMobileDevice()) {
+                          toast({
+                            title: "Desktop only",
+                            description: "The local agent is only available for desktop.",
+                            variant: "default",
+                            duration: 3000,
+                          });
+                          return;
+                        }
+                        
+                        // Open files in new tabs using postMessage for iframe compatibility
+                        window.parent.postMessage({ 
+                          type: "OPEN_EXTERNAL_URL", 
+                          data: { url: window.location.origin + '/nova-agent.py' } 
+                        }, "*");
                         
                         setTimeout(() => {
-                          const batLink = document.createElement('a');
-                          batLink.href = '/build-nova-agent.bat';
-                          batLink.download = 'build-nova-agent.bat';
-                          batLink.click();
-                        }, 300);
-                        
+                          window.parent.postMessage({ 
+                            type: "OPEN_EXTERNAL_URL", 
+                            data: { url: window.location.origin + '/build-nova-agent.bat' } 
+                          }, "*");
+                        }, 500);
+                          
                         toast({
-                          title: "Downloaded!",
-                          description: "Run build-nova-agent.bat to create NovaAgent.exe",
+                          title: "Opening files...",
+                          description: "Save both files, then run build-nova-agent.bat to create NovaAgent.exe",
                           variant: "default",
                           duration: 6000,
                         });
-                    }}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <Download className="w-4 h-4 text-nova-pink" />
-                    <div className="flex flex-col">
-                      <span className="font-medium">Download Agent</span>
-                    </div>
-                  </DropdownMenuItem>
-                )}
+                      }}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Download className="w-4 h-4 text-nova-pink" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Download Agent</span>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
