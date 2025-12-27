@@ -229,3 +229,4 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
 };
 
 export default AISettingsPanel;
+
