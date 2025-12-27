@@ -7,6 +7,8 @@ import UserSettingsPanel from "@/components/UserSettingsPanel";
 import ChatHistory from "@/components/ChatHistory";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type ContentType = 'chat';
 
