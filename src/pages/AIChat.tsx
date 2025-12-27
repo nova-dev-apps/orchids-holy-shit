@@ -117,61 +117,79 @@ const AIChat = () => {
   }), []);
 
   // Memoized Message Component for performance
-  const ChatMessage = useMemo(() => {
-    return ({ msg, isThinking, isAutoMode, isLast, copiedMessageId, handleCopy, handleRegenerate }: { 
-      msg: Message, 
-      isThinking: boolean, 
-      isAutoMode: boolean, 
-      isLast: boolean,
-      copiedMessageId: string | null,
-      handleCopy: (text: string, id: string) => void,
-      handleRegenerate: (id: string) => void
-    }) => (
-      <div className={`flex w-full ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
-        {msg.isUser ? (
-          <div className="max-w-[70%] p-4 rounded-2xl bg-white text-black border border-gray-200 shadow-sm">
-            {msg.text && <p className="text-sm leading-relaxed">{msg.text}</p>}
-            {msg.attachments && msg.attachments.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {msg.attachments.map((attachment) => (
-                  <div key={attachment.id} className="flex items-center gap-2">
-                    {attachment.type === 'image' ? (
-                      <img src={attachment.preview} alt={attachment.name} className="w-20 h-20 object-cover rounded-lg" />
-                    ) : (
-                      <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
-                        <span className="text-xs">{attachment.name}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-full flex flex-col gap-2">
-            {isThinking && isLast && !msg.text && (
-              <div className="flex items-center gap-2 mb-1">
-                {isAutoMode ? (
-                  <>
-                    <div className="flex items-center justify-center animate-pulse text-base">🛠️</div>
-                    <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
-                  </>
-                ) : (
-                  <>
-                    <Brain size={16} className="animate-pulse" style={{ color: 'black' }} />
-                    <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
-                  </>
-                )}
-              </div>
-            )}
-            {msg.text && (
-              <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-strong:text-black prose-strong:font-bold">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                  {msg.text}
-                </ReactMarkdown>
-              </div>
-            )}
-            {(!isThinking || !isLast) && msg.text && (
+    const ChatMessage = useMemo(() => {
+      return ({ msg, isThinking, isAutoMode, isLast, copiedMessageId, handleCopy, handleRegenerate, currentPlan, isExecutingAutomation, setIsExecutingAutomation }: { 
+        msg: Message, 
+        isThinking: boolean, 
+        isAutoMode: boolean, 
+        isLast: boolean,
+        copiedMessageId: string | null,
+        handleCopy: (text: string, id: string) => void,
+        handleRegenerate: (id: string) => void,
+        currentPlan: PlanStep[] | null,
+        isExecutingAutomation: boolean,
+        setIsExecutingAutomation: (val: boolean) => void
+      }) => (
+        <div className={`flex w-full ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
+          {msg.isUser ? (
+            <div className="max-w-[70%] p-4 rounded-2xl bg-white text-black border border-gray-200 shadow-sm">
+              {msg.text && <p className="text-sm leading-relaxed">{msg.text}</p>}
+              {msg.attachments && msg.attachments.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {msg.attachments.map((attachment) => (
+                    <div key={attachment.id} className="flex items-center gap-2">
+                      {attachment.type === 'image' ? (
+                        <img src={attachment.preview} alt={attachment.name} className="w-20 h-20 object-cover rounded-lg" />
+                      ) : (
+                        <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
+                          <span className="text-xs">{attachment.name}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="w-full flex flex-col gap-2">
+              {isThinking && isLast && !msg.text && (
+                <div className="flex items-center gap-2 mb-1">
+                  {isAutoMode ? (
+                    <>
+                      <div className="flex items-center justify-center animate-pulse text-base">🛠️</div>
+                      <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">preparing automation plan...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Brain size={16} className="animate-pulse" style={{ color: 'black' }} />
+                      <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">thinking...</span>
+                    </>
+                  )}
+                </div>
+              )}
+              {msg.text && (
+                <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-strong:text-black prose-strong:font-bold">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                    {msg.text}
+                  </ReactMarkdown>
+                </div>
+              )}
+              
+              {isLast && currentPlan && isAutoMode && !isThinking && (
+                <AutomationPlan 
+                  plan={currentPlan} 
+                  isExecuting={isExecutingAutomation}
+                  onStart={() => setIsExecutingAutomation(true)}
+                  onStop={() => setIsExecutingAutomation(false)}
+                  onComplete={() => {
+                    setIsExecutingAutomation(false);
+                    toast.success("Automation completed successfully!");
+                  }}
+                />
+              )}
+
+              {(!isThinking || !isLast) && msg.text && (
+
               <div className="flex items-center gap-1 mt-1">
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-black hover:bg-gray-100" onClick={() => handleCopy(msg.text, msg.id)}>
                   {copiedMessageId === msg.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
