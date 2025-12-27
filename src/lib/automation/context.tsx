@@ -245,17 +245,23 @@ export function AutomationProvider({ children }: { children: ReactNode }) {
         duration: 0,
       };
 
+      saveLog(log);
+
       return {
         ...prev,
         currentPlan: { ...prev.currentPlan, tasks: updatedTasks, status: 'cancelled' },
         executionHistory: [log, ...prev.executionHistory].slice(0, 50),
       };
     });
-  }, [executionInterval]);
+  }, [executionInterval, saveLog]);
 
-  const clearHistory = useCallback(() => {
-    setState(prev => ({ ...prev, executionHistory: [] }));
-    localStorage.removeItem('nova_execution_history');
+  const clearHistory = useCallback(async () => {
+    try {
+      await supabase.from('execution_history').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      setState(prev => ({ ...prev, executionHistory: [] }));
+    } catch (err) {
+      console.error('Failed to clear execution history:', err);
+    }
   }, []);
 
   return (
