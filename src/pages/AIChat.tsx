@@ -543,48 +543,47 @@ const AIChat = () => {
                       'Content-Type': 'application/json',
                       'Authorization': `Bearer ${apiConfig.api_key.trim()}`
                     },
-                      body: JSON.stringify({
-                        model,
-                        messages: [
-                          ...messages.slice(0, lastUserIndex).slice(-10).map(m => ({
-                            role: m.isUser ? "user" : "assistant",
-                            content: m.text
-                          })),
-                          { role: "user", content: lastUserMessage.text }
-                        ],
-                        stream: true
-                      }),
-                    signal: abortControllerRef.current.signal
-                  });
+                        body: JSON.stringify({
+                          model,
+                          messages: [
+                            ...messages.slice(0, lastUserIndex).slice(-6).map(m => ({
+                              role: m.isUser ? "user" : "assistant",
+                              content: m.text
+                            })),
+                            { role: "user", content: lastUserMessage.text }
+                          ],
+                          stream: true
+                        }),
+                      signal: abortControllerRef.current.signal
+                    });
 
-            if (!response.ok) {
-              const errorData = await response.json().catch(() => ({}));
-              throw new Error(errorData.error?.message || `API error: ${response.status}`);
-            }
+              if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `API error: ${response.status}`);
+              }
 
-            const reader = response.body?.getReader();
-            const decoder = new TextDecoder();
-            let aiText = "";
-            
-            // Empty message already added above
-            
-            if (reader) {
-              let buffer = "";
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+              const reader = response.body?.getReader();
+              const decoder = new TextDecoder();
+              let aiText = "";
+              let lastUpdate = Date.now();
+              
+              if (reader) {
+                let buffer = "";
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
 
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split("\n");
-                buffer = lines.pop() || ""; // Keep the last partial line in the buffer
-                
-                let chunkText = "";
-                for (const line of lines) {
-                  const trimmedLine = line.trim();
-                  if (!trimmedLine || !trimmedLine.startsWith("data: ")) continue;
+                  buffer += decoder.decode(value, { stream: true });
+                  const lines = buffer.split("\n");
+                  buffer = lines.pop() || "";
                   
-                  const data = trimmedLine.slice(6);
-                  if (data === "[DONE]") break;
+                  let chunkText = "";
+                  for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine || !trimmedLine.startsWith("data: ")) continue;
+                    
+                    const data = trimmedLine.slice(6);
+                    if (data === "[DONE]") break;
 
                     try {
                       const json = JSON.parse(data);
@@ -592,26 +591,40 @@ const AIChat = () => {
                       if (content) {
                         chunkText += content;
                       }
-                    } catch (e) {
-                      // Ignore parsing errors
-                    }
-                }
+                    } catch (e) {}
+                  }
 
-                if (chunkText) {
-                  aiText += chunkText;
-                  setContentState(prev => {
-                    const activeMessages = prev[activeTab];
-                    const lastMsg = activeMessages[activeMessages.length - 1];
-                    if (lastMsg.id === aiResponseId) {
-                      const newMessages = [...activeMessages];
-                      newMessages[newMessages.length - 1] = { ...lastMsg, text: aiText };
-                      return { ...prev, [activeTab]: newMessages };
+                  if (chunkText) {
+                    aiText += chunkText;
+                    
+                    const now = Date.now();
+                    if (now - lastUpdate > 50) {
+                      setContentState(prev => {
+                        const activeMessages = prev[activeTab];
+                        const lastMsg = activeMessages[activeMessages.length - 1];
+                        if (lastMsg.id === aiResponseId) {
+                          const newMessages = [...activeMessages];
+                          newMessages[newMessages.length - 1] = { ...lastMsg, text: aiText };
+                          return { ...prev, [activeTab]: newMessages };
+                        }
+                        return prev;
+                      });
+                      lastUpdate = now;
                     }
-                    return prev;
-                  });
+                  }
                 }
+                
+                setContentState(prev => {
+                  const activeMessages = prev[activeTab];
+                  const lastMsg = activeMessages[activeMessages.length - 1];
+                  if (lastMsg.id === aiResponseId) {
+                    const newMessages = [...activeMessages];
+                    newMessages[newMessages.length - 1] = { ...lastMsg, text: aiText };
+                    return { ...prev, [activeTab]: newMessages };
+                  }
+                  return prev;
+                });
               }
-            }
 
             } catch (error: any) {
               if (error.name === 'AbortError' || 
