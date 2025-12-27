@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowUp, Paperclip, Plus, Wrench, Hammer, Square } from "lucide-react";
+import { ArrowUp, Paperclip, Plus, Wrench, Hammer, Square, Download } from "lucide-react";
 import { AttachmentPreview } from "./AttachmentPreview";
 import { useToast } from "@/hooks/use-toast";
 import {
