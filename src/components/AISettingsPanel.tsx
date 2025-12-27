@@ -22,6 +22,8 @@ export interface ChatSettings {
   personalInstructions: string;
 }
 
+const PERSONAL_INSTRUCTIONS_KEY = "nova_personal_instructions";
+
 const AISettingsPanel = ({ 
   isOpen, 
   onToggle, 
@@ -41,9 +43,6 @@ const AISettingsPanel = ({
       const loadSettings = async () => {
         setIsLoading(true);
         try {
-          const { data: { user } } = await supabase.auth.getUser();
-          
-          // Load Global Instructions (Admin Only)
           if (isAdmin) {
             const { data: globalData } = await supabase
               .from('ai_config')
@@ -56,17 +55,9 @@ const AISettingsPanel = ({
             }
           }
 
-          // Load Personal Instructions
-          if (user) {
-            const { data: userData } = await supabase
-              .from('ai_config')
-              .select('custom_instructions')
-              .eq('id', user.id)
-              .maybeSingle();
-            
-            if (userData?.custom_instructions) {
-              setChatSettings(prev => ({ ...prev, personalInstructions: userData.custom_instructions }));
-            }
+          const savedPersonal = localStorage.getItem(PERSONAL_INSTRUCTIONS_KEY);
+          if (savedPersonal) {
+            setChatSettings(prev => ({ ...prev, personalInstructions: savedPersonal }));
           }
         } catch (err) {
           console.error("Error loading settings:", err);
@@ -99,21 +90,9 @@ const AISettingsPanel = ({
     }
   };
 
-  const handleSavePersonalSettings = async () => {
+  const handleSavePersonalSettings = () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from('ai_config')
-        .upsert({ 
-          id: user.id,
-          custom_instructions: chatSettings.personalInstructions,
-          updated_at: new Date().toISOString()
-        });
-      
-      if (error) throw error;
-      
+      localStorage.setItem(PERSONAL_INSTRUCTIONS_KEY, chatSettings.personalInstructions);
       toast.success("Personal instructions saved");
       window.dispatchEvent(new CustomEvent('ai-config-update'));
     } catch (error: any) {
