@@ -382,35 +382,35 @@ const AIChat = () => {
                   if (chunkText) {
                     aiText += chunkText;
                     
-                    // Throttled UI updates (every 50ms) to prevent excessive re-renders
-                    const now = Date.now();
-                    if (now - lastUpdate > 50) {
-                      setContentState(prev => {
-                        const activeMessages = prev[activeTab];
-                        const lastMsg = activeMessages[activeMessages.length - 1];
-                        if (lastMsg.id === aiResponseId) {
-                          const newMessages = [...activeMessages];
-                          newMessages[newMessages.length - 1] = { ...lastMsg, text: aiText };
-                          return { ...prev, [activeTab]: newMessages };
-                        }
-                        return prev;
-                      });
-                      lastUpdate = now;
+                      // Throttled UI updates (every 80ms) to prevent excessive re-renders
+                      const now = Date.now();
+                      if (now - lastUpdate > 80) {
+                        setContentState(prev => {
+                          const activeMessages = prev[activeTab];
+                          const lastIdx = activeMessages.length - 1;
+                          if (lastIdx >= 0 && activeMessages[lastIdx].id === aiResponseId) {
+                            const newMessages = [...activeMessages];
+                            newMessages[lastIdx] = { ...newMessages[lastIdx], text: aiText };
+                            return { ...prev, [activeTab]: newMessages };
+                          }
+                          return prev;
+                        });
+                        lastUpdate = now;
+                      }
                     }
                   }
-                }
-                
-                // Final update to ensure all text is shown
-                setContentState(prev => {
-                  const activeMessages = prev[activeTab];
-                  const lastMsg = activeMessages[activeMessages.length - 1];
-                  if (lastMsg.id === aiResponseId) {
-                    const newMessages = [...activeMessages];
-                    newMessages[newMessages.length - 1] = { ...lastMsg, text: aiText };
-                    return { ...prev, [activeTab]: newMessages };
-                  }
-                  return prev;
-                });
+                  
+                  // Final update to ensure all text is shown
+                  setContentState(prev => {
+                    const activeMessages = prev[activeTab];
+                    const lastIdx = activeMessages.length - 1;
+                    if (lastIdx >= 0 && activeMessages[lastIdx].id === aiResponseId) {
+                      const newMessages = [...activeMessages];
+                      newMessages[lastIdx] = { ...newMessages[lastIdx], text: aiText };
+                      return { ...prev, [activeTab]: newMessages };
+                    }
+                    return prev;
+                  });
               }
             } catch (error: any) {
               if (error.name === 'AbortError' || 
