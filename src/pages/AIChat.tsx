@@ -623,20 +623,20 @@ const AIChat = () => {
                                             {isAutoMode ? (
                                               <>
                                                       <div className="relative w-5 h-5 animate-pulse flex items-center justify-center">
-                                                                <Wrench 
-                                                                  size={16} 
-                                                                  className="absolute" 
-                                                                  style={{ 
-                                                                    color: 'black', 
-                                                                    transform: 'rotate(-45deg)'
-                                                                  }} 
-                                                                />
                                                                 <Hammer 
                                                                   size={16} 
                                                                   className="absolute" 
                                                                   style={{ 
                                                                     color: 'black', 
-                                                                    transform: 'rotate(45deg)'
+                                                                    transform: 'rotate(60deg)'
+                                                                  }} 
+                                                                />
+                                                                <Wrench 
+                                                                  size={16} 
+                                                                  className="absolute" 
+                                                                  style={{ 
+                                                                    color: 'black', 
+                                                                    transform: 'rotate(-60deg)'
                                                                   }} 
                                                                 />
                                                       </div>
