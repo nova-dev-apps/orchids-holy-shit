@@ -195,26 +195,19 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                       });
                       return;
                     }
-                    const placeholderContent = new Uint8Array([
-                      0x4D, 0x5A,
-                      ...Array(510).fill(0)
-                    ]);
-                    const blob = new Blob([placeholderContent], { type: 'application/octet-stream' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = 'nova-agent-setup.exe';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                    toast({
-                      title: "Download started",
-                      description: "Nova Agent installer is downloading...",
-                      variant: "default",
-                      duration: 3000,
-                    });
-                  }}
+                      const link = document.createElement('a');
+                      link.href = '/nova-agent-setup.exe';
+                      link.download = 'nova-agent-setup.exe';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      toast({
+                        title: "Download started",
+                        description: "Nova Agent installer is downloading...",
+                        variant: "default",
+                        duration: 3000,
+                      });
+                    }}
                   className="flex items-center gap-2 cursor-pointer"
                 >
                   <Download className="w-4 h-4 text-nova-pink" />
