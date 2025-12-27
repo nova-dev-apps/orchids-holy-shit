@@ -628,7 +628,7 @@ const AIChat = () => {
                                                                   className="absolute" 
                                                                   style={{ 
                                                                     color: 'black', 
-                                                                    transform: 'rotate(60deg)'
+                                                                    transform: 'rotate(30deg)'
                                                                   }} 
                                                                 />
                                                                 <Wrench 
@@ -636,7 +636,7 @@ const AIChat = () => {
                                                                   className="absolute" 
                                                                   style={{ 
                                                                     color: 'black', 
-                                                                    transform: 'rotate(-60deg)'
+                                                                    transform: 'rotate(-30deg)'
                                                                   }} 
                                                                 />
                                                       </div>
