@@ -626,27 +626,31 @@ const AIChat = () => {
                     ? cleanUrl 
                     : `${cleanUrl}/chat/completions`;
 
-                  const model = apiConfig.model?.trim() || "gpt-4o";
+                    const model = apiConfig.model?.trim() || "gpt-4o";
 
+                    const systemPrompt = [
+                      apiConfig.custom_instructions,
+                      apiConfig.personal_instructions ? `User's Personal Instructions:\n${apiConfig.personal_instructions}` : null
+                    ].filter(Boolean).join("\n\n");
 
-const response = await fetch(url, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiConfig.api_key.trim()}`
-                      },
-                          body: JSON.stringify({
-                            model,
-                            messages: [
-                              ...(apiConfig.custom_instructions ? [{ role: "system", content: apiConfig.custom_instructions }] : []),
-                              ...messages.slice(0, lastUserIndex).slice(-10).map(m => ({
-                                role: m.isUser ? "user" : "assistant",
-                                content: m.text.substring(0, 4000)
-                              })),
-                              { role: "user", content: lastUserMessage.text.substring(0, 4000) }
-                            ],
-                            stream: true
-                          }),
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${apiConfig.api_key.trim()}`
+                        },
+                            body: JSON.stringify({
+                              model,
+                              messages: [
+                                ...(systemPrompt ? [{ role: "system", content: systemPrompt }] : []),
+                                ...messages.slice(0, lastUserIndex).slice(-10).map(m => ({
+                                  role: m.isUser ? "user" : "assistant",
+                                  content: m.text.substring(0, 4000)
+                                })),
+                                { role: "user", content: lastUserMessage.text.substring(0, 4000) }
+                              ],
+                              stream: true
+                            }),
                         signal: abortControllerRef.current.signal
                       });
 
