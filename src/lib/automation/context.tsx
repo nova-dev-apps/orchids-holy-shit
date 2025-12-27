@@ -145,6 +145,23 @@ export function AutomationProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const saveLog = useCallback(async (log: ExecutionLog) => {
+    try {
+      await supabase.from('execution_history').insert({
+        plan_id: log.planId,
+        plan_title: log.planTitle,
+        status: log.status,
+        tasks_completed: log.tasksCompleted,
+        total_tasks: log.totalTasks,
+        executed_at: log.executedAt.toISOString(),
+        duration: log.duration,
+        error: log.error || null,
+      });
+    } catch (err) {
+      console.error('Failed to save execution log:', err);
+    }
+  }, []);
+
   const executePlan = useCallback(() => {
     if (!state.currentPlan || !state.isEnabled) return;
 
@@ -176,6 +193,8 @@ export function AutomationProvider({ children }: { children: ReactNode }) {
             duration: Date.now() - startTime,
           };
 
+          saveLog(log);
+
           return {
             ...prev,
             currentPlan: { ...prev.currentPlan, status: 'completed' },
@@ -198,7 +217,7 @@ export function AutomationProvider({ children }: { children: ReactNode }) {
     }, 2000);
 
     setExecutionInterval(interval);
-  }, [state.currentPlan, state.isEnabled, updateTaskStatus]);
+  }, [state.currentPlan, state.isEnabled, updateTaskStatus, saveLog]);
 
   const stopExecution = useCallback(() => {
     if (executionInterval) {
