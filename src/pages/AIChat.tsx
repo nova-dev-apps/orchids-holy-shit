@@ -623,22 +623,22 @@ const AIChat = () => {
                                             {isAutoMode ? (
                                               <>
                                                       <div className="relative w-5 h-5 animate-pulse flex items-center justify-center">
-                                                              <Wrench 
-                                                                size={16} 
-                                                                className="absolute" 
-                                                                style={{ 
-                                                                  color: 'black', 
-                                                                  transform: 'rotate(-75deg)'
-                                                                }} 
-                                                              />
-                                                              <Hammer 
-                                                                size={16} 
-                                                                className="absolute" 
-                                                                style={{ 
-                                                                  color: 'black', 
-                                                                  transform: 'rotate(30deg)'
-                                                                }} 
-                                                              />
+                                                                <Wrench 
+                                                                  size={16} 
+                                                                  className="absolute" 
+                                                                  style={{ 
+                                                                    color: 'black', 
+                                                                    transform: 'rotate(-30deg)'
+                                                                  }} 
+                                                                />
+                                                                <Hammer 
+                                                                  size={16} 
+                                                                  className="absolute" 
+                                                                  style={{ 
+                                                                    color: 'black', 
+                                                                    transform: 'rotate(30deg)'
+                                                                  }} 
+                                                                />
                                                       </div>
                                                 <span className="text-sm text-gray-400 thinking-glow font-medium animate-pulse">automating...</span>
                                               </>
