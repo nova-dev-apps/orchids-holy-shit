@@ -28,10 +28,13 @@ interface TokenLimits {
   chatTokensPerSession: number;
 }
 
-const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStrictMode, isAdmin }: AISettingsPanelProps) => {
-  const [chatSettings, setChatSettings] = useState<ChatSettings>({
-    customInstructions: ""
-  });
+  const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStrictMode, isAdmin: propIsAdmin }: AISettingsPanelProps) => {
+    // Robust admin check: check prop first, then localStorage
+    const isAdmin = propIsAdmin || localStorage.getItem("isAdmin") === "true";
+
+    const [chatSettings, setChatSettings] = useState<ChatSettings>({
+      customInstructions: ""
+    });
 
   const [tokenLimits, setTokenLimits] = useState<TokenLimits>({
     chatTokensPerDay: 10000,
@@ -216,10 +219,24 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="space-y-8">
-                {renderChatSettings()}
-                {renderAutomationSettings()}
-              </div>
+                <div className="space-y-8">
+                  {isAdmin ? (
+                    <>
+                      {renderChatSettings()}
+                      {renderAutomationSettings()}
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                        <Menu className="h-6 w-6 text-gray-400" />
+                      </div>
+                      <h3 className="text-sm font-medium text-foreground mb-1">Admin Access Required</h3>
+                      <p className="text-xs text-muted-foreground">
+                        You must be logged in as an administrator to access these settings.
+                      </p>
+                    </div>
+                  )}
+                </div>
             </div>
           </div>
         </div>
