@@ -233,17 +233,7 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                     </DropdownMenuItem>
                   )}
 
-              {isAdmin && onToggleStrictMode && (
-                <DropdownMenuItem
-                  onClick={onToggleStrictMode}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <div className={`w-2 h-2 rounded-full ${strictMode ? 'bg-nova-pink' : 'bg-gray-400'}`} />
-                  <span>Strict Mode</span>
-                  {strictMode && <span className="ml-auto text-xs text-nova-pink">On</span>}
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
+              </DropdownMenuContent>
           </DropdownMenu>
         )}
 
