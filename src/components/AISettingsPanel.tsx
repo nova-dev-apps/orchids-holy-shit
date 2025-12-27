@@ -12,8 +12,6 @@ interface AISettingsPanelProps {
   activeTab: ContentType;
   isOpen: boolean;
   onToggle: () => void;
-  strictMode: boolean;
-  onToggleStrictMode: () => void;
   isAdmin?: boolean;
 }
 
