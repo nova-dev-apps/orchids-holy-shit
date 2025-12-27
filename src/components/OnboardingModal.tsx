@@ -15,11 +15,21 @@ interface OnboardingModalProps {
   onComplete: () => void;
 }
 
-  export const OnboardingModal = ({ onComplete }: OnboardingModalProps) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [hasConsent, setHasConsent] = useState(false);
-  
-    const handleContinue = () => {
+    export const OnboardingModal = ({ onComplete }: OnboardingModalProps) => {
+      const [isOpen, setIsOpen] = useState(false);
+      const [hasConsent, setHasConsent] = useState(false);
+    
+      useEffect(() => {
+        const consent = localStorage.getItem("nova_automation_consent");
+        const isLocalAgent = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        // Only pop up automatically if we're in the local agent context and consent hasn't been given
+        if (!consent && isLocalAgent && false) { // Set to false to disable auto-popup as requested
+          setIsOpen(true);
+        }
+      }, []);
+
+      const handleContinue = () => {
     if (hasConsent) {
       localStorage.setItem("nova_automation_consent", "true");
       setIsOpen(false);
