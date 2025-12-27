@@ -528,44 +528,52 @@ if __name__ == "__main__":
     run_control_panel()
 `;
 
-                            const batContent = `@echo off
-echo Building Nova Agent...
-echo.
-echo Installing dependencies...
-pip install pyinstaller pyperclip
-echo.
-echo Creating executable...
-pyinstaller --onefile --windowed --name NovaAgent nova-agent.py
-echo.
-echo Done! Your NovaAgent.exe is in the dist folder.
-pause
+                              const fullPs1 = ps1Content + `
+$scriptContent = @'
+` + pyContent + `
+'@
+
+$scriptPath = "$buildDir\\nova-agent.py"
+$scriptContent | Out-File -FilePath $scriptPath -Encoding utf8
+Write-Host "[OK] Script ready!" -ForegroundColor Green
+
+Write-Host ""
+Write-Host "[*] Building NovaAgent.exe (1-2 minutes)..." -ForegroundColor Cyan
+Push-Location $buildDir
+python -m PyInstaller --onefile --noconsole --name NovaAgent nova-agent.py 2>&1 | Out-Null
+Pop-Location
+
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$exePath = "$buildDir\\dist\\NovaAgent.exe"
+
+if (Test-Path $exePath) {
+    Copy-Item $exePath "$desktopPath\\NovaAgent.exe" -Force
+    Write-Host ""
+    Write-Host "==========================================" -ForegroundColor Green
+    Write-Host "  SUCCESS! NovaAgent.exe on Desktop!     " -ForegroundColor Green
+    Write-Host "==========================================" -ForegroundColor Green
+    Write-Host ""
+    Remove-Item -Recurse -Force $buildDir -ErrorAction SilentlyContinue
+    Start-Process "$desktopPath\\NovaAgent.exe"
+} else {
+    Write-Host "[ERROR] Build failed." -ForegroundColor Red
+}
 `;
 
-                            const pyBlob = new Blob([pyContent], { type: 'text/plain' });
-                            const batBlob = new Blob([batContent], { type: 'text/plain' });
-                            
-                            const pyUrl = URL.createObjectURL(pyBlob);
-                            const pyLink = document.createElement('a');
-                            pyLink.href = pyUrl;
-                            pyLink.download = 'nova-agent.py';
-                            pyLink.click();
-                            URL.revokeObjectURL(pyUrl);
-                            
-                            setTimeout(() => {
-                              const batUrl = URL.createObjectURL(batBlob);
-                              const batLink = document.createElement('a');
-                              batLink.href = batUrl;
-                              batLink.download = 'build-nova-agent.bat';
-                              batLink.click();
-                              URL.revokeObjectURL(batUrl);
-                            }, 500);
-                            
-                            toast({
-                              title: "Files downloading!",
-                              description: "Save both files to same folder, then run build-nova-agent.bat",
-                              variant: "default",
-                              duration: 6000,
-                            });
+                              const ps1Blob = new Blob([fullPs1], { type: 'text/plain' });
+                              const ps1Url = URL.createObjectURL(ps1Blob);
+                              const ps1Link = document.createElement('a');
+                              ps1Link.href = ps1Url;
+                              ps1Link.download = 'Install-NovaAgent.ps1';
+                              ps1Link.click();
+                              URL.revokeObjectURL(ps1Url);
+                              
+                              toast({
+                                title: "Installer downloaded!",
+                                description: "Right-click Install-NovaAgent.ps1 → Run with PowerShell",
+                                variant: "default",
+                                duration: 8000,
+                              });
                           }}
                           className="flex items-center gap-2 cursor-pointer"
                         >
