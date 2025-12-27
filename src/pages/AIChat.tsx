@@ -414,7 +414,12 @@ const AIChat = () => {
             
             const model = apiConfig.model?.trim() || "gpt-4o";
             
-const response = await fetch(url, {
+            const systemPrompt = [
+              apiConfig.custom_instructions,
+              apiConfig.personal_instructions ? `User's Personal Instructions:\n${apiConfig.personal_instructions}` : null
+            ].filter(Boolean).join("\n\n");
+
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -423,7 +428,7 @@ const response = await fetch(url, {
                   body: JSON.stringify({
                     model,
                           messages: [
-                            ...(apiConfig.custom_instructions ? [{ role: "system", content: apiConfig.custom_instructions }] : []),
+                            ...(systemPrompt ? [{ role: "system", content: systemPrompt }] : []),
                             ...contentState[activeTab].slice(-10).map(m => ({
                               role: m.isUser ? "user" : "assistant",
                               content: m.text.substring(0, 4000)
