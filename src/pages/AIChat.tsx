@@ -412,10 +412,25 @@ const AIChat = () => {
         ]
       }));
 
-      // If AI config is available, use real API
-      if (apiConfig?.api_key && apiConfig?.endpoint_url) {
-        try {
-            const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
+        // If AI config is available, use real API
+        if (apiConfig?.api_key && apiConfig?.endpoint_url) {
+          try {
+              if (isAutoMode) {
+                // Mock a plan for demonstration of "thinking vs doing"
+                const mockPlan: PlanStep[] = [
+                  { id: '1', action: 'Scanning project structure...', status: 'pending' },
+                  { id: '2', action: 'Analyzing requirements for automation...', status: 'pending' },
+                  { id: '3', action: 'Creating temporary workspace...', status: 'pending' },
+                  { id: '4', action: 'Executing secure commands via local agent...', status: 'pending' },
+                  { id: '5', action: 'Finalizing and reporting results...', status: 'pending' }
+                ];
+                setCurrentPlan(mockPlan);
+              } else {
+                setCurrentPlan(null);
+              }
+
+              const cleanUrl = apiConfig.endpoint_url.trim().replace(/\/+$/, '');
+
             const url = cleanUrl.toLowerCase().includes('/chat/completions') 
               ? cleanUrl 
               : `${cleanUrl}/chat/completions`;
