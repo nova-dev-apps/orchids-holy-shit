@@ -217,11 +217,7 @@ const AISettingsPanel = ({
               )}
             </div>
             
-            <div className="p-4 border-t border-border bg-muted/30">
-              <p className="text-[10px] text-center text-muted-foreground uppercase tracking-wider font-semibold">
-                Intelligence Engine v2.0
-              </p>
-            </div>
+
           </div>
         </div>
       )}
