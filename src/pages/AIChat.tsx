@@ -785,6 +785,7 @@ const AIChat = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <OnboardingModal onComplete={() => setShowOnboarding(false)} />
       {/* Main chat area */}
       <div className="flex-1 flex flex-col relative">
         {/* Messages area */}
