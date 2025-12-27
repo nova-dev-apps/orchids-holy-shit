@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Bot, Zap, Settings, TrendingUp, Cpu } from "lucide-react";
+import { Bot, Zap, Settings, TrendingUp } from "lucide-react";
 import FeatureCard from "@/components/FeatureCard";
 import { NovaLogoSvg } from "@/components/NovaLogoSvg";
 
@@ -10,16 +10,6 @@ const Index = () => {
       {/* Header */}
       <header className="flex items-center justify-between px-6 pt-8 pb-6 max-w-6xl mx-auto">
         <NovaLogoSvg className="h-12 w-auto" />
-        <Link to="/automation">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full text-sm gap-2"
-          >
-            <Cpu className="w-4 h-4" />
-            Automation
-          </Button>
-        </Link>
       </header>
 
       {/* Hero Section */}
