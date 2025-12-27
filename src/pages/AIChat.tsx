@@ -330,13 +330,13 @@ const AIChat = () => {
               },
                 body: JSON.stringify({
                   model,
-                    messages: [
-                      ...contentState[activeTab].slice(-6).map(m => ({
-                        role: m.isUser ? "user" : "assistant",
-                        content: m.text
-                      })),
-                      { role: "user", content: messageText }
-                    ],
+                        messages: [
+                          ...contentState[activeTab].slice(-10).map(m => ({
+                            role: m.isUser ? "user" : "assistant",
+                            content: m.text.substring(0, 4000)
+                          })),
+                          { role: "user", content: messageText.substring(0, 4000) }
+                        ],
                     stream: true
                   }),
                 signal: abortControllerRef.current.signal
