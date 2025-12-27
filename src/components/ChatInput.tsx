@@ -159,38 +159,67 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                 <Plus className="w-5 h-5 text-gray-600" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40">
-              <DropdownMenuItem
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <Paperclip className="w-4 h-4" />
-                <span>Attachment</span>
-              </DropdownMenuItem>
-              {activeTab === 'chat' && (
+              <DropdownMenuContent align="start" className="w-48">
                 <DropdownMenuItem
-                  onClick={() => {
-                    if (isMobileDevice()) {
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <Paperclip className="w-4 h-4" />
+                  <span>Attachment</span>
+                </DropdownMenuItem>
+                {activeTab === 'chat' && (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (isMobileDevice()) {
+                        toast({
+                          title: "Not available for phones",
+                          description: "",
+                          variant: "default",
+                          duration: 3000,
+                        });
+                        return;
+                      }
+                      const newState = !isAutoActive;
+                      setIsAutoActive(newState);
+                      onAutoModeToggle?.(newState);
+                    }}
+                    className="flex items-center gap-2 cursor-pointer"
+                    data-testid="menu-item-auto-mode"
+                  >
+                    <div className={`w-2 h-2 rounded-full ${isAutoActive ? 'bg-nova-pink' : 'bg-gray-400'}`} />
+                    <span>Auto Mode</span>
+                    {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
+                  </DropdownMenuItem>
+                )}
+                {activeTab === 'chat' && (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (isMobileDevice()) {
+                        toast({
+                          title: "Desktop only",
+                          description: "The local agent is only available for desktop.",
+                          variant: "default",
+                          duration: 3000,
+                        });
+                        return;
+                      }
+                      const link = document.createElement('a');
+                      link.href = '/nova-agent-setup.exe';
+                      link.download = 'nova-agent-setup.exe';
+                      link.click();
                       toast({
-                        title: "Not available for phones",
-                        description: "",
+                        title: "Download started",
+                        description: "Nova Agent installer is downloading...",
                         variant: "default",
                         duration: 3000,
                       });
-                      return;
-                    }
-                    const newState = !isAutoActive;
-                    setIsAutoActive(newState);
-                    onAutoModeToggle?.(newState);
-                  }}
-                  className="flex items-center gap-2 cursor-pointer"
-                  data-testid="menu-item-auto-mode"
-                >
-                  <div className={`w-2 h-2 rounded-full ${isAutoActive ? 'bg-nova-pink' : 'bg-gray-400'}`} />
-                  <span>Auto Mode</span>
-                  {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
-                </DropdownMenuItem>
-              )}
+                    }}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download Agent</span>
+                  </DropdownMenuItem>
+                )}
               {isAdmin && onToggleStrictMode && (
                 <DropdownMenuItem
                   onClick={onToggleStrictMode}
