@@ -47,6 +47,70 @@ const AIChat = () => {
   const aiTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Memoize markdown components to prevent re-creation on every stream chunk
+  const markdownComponents = useMemo(() => ({
+    table: ({ node, ...props }: any) => {
+      const tableRef = useRef<HTMLTableElement>(null);
+      const [isCopied, setIsCopied] = useState(false);
+
+      const handleCopyTable = async () => {
+        if (!tableRef.current) return;
+        
+        let tableText = "";
+        const rows = tableRef.current.querySelectorAll("tr");
+        
+        rows.forEach((row, rowIndex) => {
+          const cells = row.querySelectorAll("th, td");
+          const cellTexts: string[] = [];
+          cells.forEach(cell => {
+            cellTexts.push(cell.textContent?.trim() || "");
+          });
+          tableText += cellTexts.join("\t") + (rowIndex < rows.length - 1 ? "\n" : "");
+        });
+
+        try {
+          await navigator.clipboard.writeText(tableText);
+          setIsCopied(true);
+          toast.success("Table copied to clipboard");
+          setTimeout(() => setIsCopied(false), 2000);
+        } catch (err) {
+          toast.error("Failed to copy table");
+        }
+      };
+
+      return (
+        <div className="group relative my-4 overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-white">
+          <div className="absolute right-2 top-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              variant="secondary"
+              size="icon"
+              className="h-8 w-8 bg-white shadow-sm border border-gray-200 hover:bg-gray-50"
+              onClick={handleCopyTable}
+              title="Copy table to clipboard"
+            >
+              {isCopied ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <ClipboardCopy className="h-4 w-4 text-gray-500" />
+              )}
+            </Button>
+          </div>
+          <div className="overflow-x-auto">
+            <table ref={tableRef} className="min-w-full divide-y divide-gray-200" {...props} />
+          </div>
+        </div>
+      );
+    },
+    thead: ({ node, ...props }: any) => <thead className="bg-gray-50" {...props} />,
+    th: ({ node, ...props }: any) => <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b" {...props} />,
+    td: ({ node, ...props }: any) => <td className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100 last:border-b-0" {...props} />,
+    p: ({ node, ...props }: any) => <p className="mb-3 last:mb-0" {...props} />,
+    strong: ({ node, ...props }: any) => <strong className="font-bold text-black" {...props} />,
+    code: ({ node, ...props }: any) => <code className="bg-gray-100 px-1 rounded text-nova-pink" {...props} />,
+    ul: ({ node, ...props }: any) => <ul className="list-disc pl-4 mb-3" {...props} />,
+    ol: ({ node, ...props }: any) => <ol className="list-decimal pl-4 mb-3" {...props} />,
+  }), []);
+
   // Check admin status
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
