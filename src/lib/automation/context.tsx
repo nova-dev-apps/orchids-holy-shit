@@ -275,6 +275,7 @@ export function AutomationProvider({ children }: { children: ReactNode }) {
       stopExecution,
       updateTaskStatus,
       clearHistory,
+      loadHistory,
     }}>
       {children}
     </AutomationContext.Provider>
