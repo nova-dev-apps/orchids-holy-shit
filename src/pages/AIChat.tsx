@@ -638,12 +638,31 @@ const AIChat = () => {
                                         </div>
                                     )}
                                 
-                                {/* Message Text */}
-                                {msg.text && (
-                                  <div className="text-black text-base leading-relaxed max-w-[85%] whitespace-pre-wrap break-words animate-blur-in">
-                                    {msg.text}
-                                  </div>
-                                )}
+                                  {/* Message Text */}
+                                  {msg.text && (
+                                    <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-strong:text-black prose-strong:font-bold">
+                                      <ReactMarkdown 
+                                        remarkPlugins={[remarkGfm]}
+                                        components={{
+                                          table: ({node, ...props}) => (
+                                            <div className="my-4 overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                                              <table className="min-w-full divide-y divide-gray-200" {...props} />
+                                            </div>
+                                          ),
+                                          thead: ({node, ...props}) => <thead className="bg-gray-50" {...props} />,
+                                          th: ({node, ...props}) => <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b" {...props} />,
+                                          td: ({node, ...props}) => <td className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100 last:border-b-0" {...props} />,
+                                          p: ({node, ...props}) => <p className="mb-3 last:mb-0" {...props} />,
+                                          strong: ({node, ...props}) => <strong className="font-bold text-black" {...props} />,
+                                          code: ({node, ...props}) => <code className="bg-gray-100 px-1 rounded text-nova-pink" {...props} />,
+                                          ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-3" {...props} />,
+                                          ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-3" {...props} />,
+                                        }}
+                                      >
+                                        {msg.text}
+                                      </ReactMarkdown>
+                                    </div>
+                                  )}
 
                               {/* Action Buttons - Only show when response is finished */}
                               {(!isThinking || msg.id !== currentMessages[currentMessages.length - 1].id) && msg.text && (
