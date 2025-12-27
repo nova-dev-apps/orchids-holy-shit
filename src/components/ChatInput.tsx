@@ -219,7 +219,6 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                     <Download className="w-4 h-4 text-nova-pink" />
                     <div className="flex flex-col">
                       <span className="font-medium">Download Agent</span>
-                      <span className="text-[10px] text-gray-400">Windows (.exe)</span>
                     </div>
                   </DropdownMenuItem>
                 )}
