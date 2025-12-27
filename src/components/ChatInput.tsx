@@ -196,49 +196,24 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                         return;
                       }
                       
-                      fetch('/nova-agent.py')
-                        .then(response => response.text())
-                        .then(pyCode => {
-                          const blob = new Blob([pyCode], { type: 'text/x-python' });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = 'nova-agent.py';
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-                          URL.revokeObjectURL(url);
-                          
-                          setTimeout(() => {
-                            fetch('/build-nova-agent.bat')
-                              .then(response => response.text())
-                              .then(batCode => {
-                                const batBlob = new Blob([batCode], { type: 'application/bat' });
-                                const batUrl = URL.createObjectURL(batBlob);
-                                const batA = document.createElement('a');
-                                batA.href = batUrl;
-                                batA.download = 'build-nova-agent.bat';
-                                document.body.appendChild(batA);
-                                batA.click();
-                                document.body.removeChild(batA);
-                                URL.revokeObjectURL(batUrl);
-                              });
-                          }, 500);
-                          
-                          toast({
-                            title: "Downloaded!",
-                            description: "Run build-nova-agent.bat to create NovaAgent.exe",
-                            variant: "default",
-                            duration: 6000,
-                          });
-                        })
-                        .catch(() => {
-                          toast({
-                            title: "Download failed",
-                            description: "Could not download the agent files.",
-                            variant: "destructive",
-                            duration: 3000,
-                          });
+                      // Direct download links
+                        const pyLink = document.createElement('a');
+                        pyLink.href = '/nova-agent.py';
+                        pyLink.download = 'nova-agent.py';
+                        pyLink.click();
+                        
+                        setTimeout(() => {
+                          const batLink = document.createElement('a');
+                          batLink.href = '/build-nova-agent.bat';
+                          batLink.download = 'build-nova-agent.bat';
+                          batLink.click();
+                        }, 300);
+                        
+                        toast({
+                          title: "Downloaded!",
+                          description: "Run build-nova-agent.bat to create NovaAgent.exe",
+                          variant: "default",
+                          duration: 6000,
                         });
                     }}
                     className="flex items-center gap-2 cursor-pointer"
