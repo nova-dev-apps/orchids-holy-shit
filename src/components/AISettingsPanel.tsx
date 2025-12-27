@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -20,7 +20,6 @@ interface AISettingsPanelProps {
 
 export interface ChatSettings {
   customInstructions: string;
-  aiInstructions?: string;
 }
 
 interface TokenLimits {
@@ -30,20 +29,16 @@ interface TokenLimits {
 }
 
 const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStrictMode, isAdmin }: AISettingsPanelProps) => {
-  // Chat settings
   const [chatSettings, setChatSettings] = useState<ChatSettings>({
-    customInstructions: "",
-    aiInstructions: ""
+    customInstructions: ""
   });
 
-  // Token limits
   const [tokenLimits, setTokenLimits] = useState<TokenLimits>({
     chatTokensPerDay: 10000,
     automationTokensPerDay: 5000,
     chatTokensPerSession: 2000
   });
 
-  // Load token limits from localStorage
   useEffect(() => {
     const savedTokens = localStorage.getItem('tokenLimits');
     if (savedTokens) {
@@ -51,7 +46,6 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
     }
   }, []);
 
-  // Load custom instructions from Supabase (admin only)
   useEffect(() => {
     if (isAdmin) {
       const loadCustomInstructions = async () => {
@@ -71,7 +65,7 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
 
   const handleSaveTokenLimits = () => {
     localStorage.setItem('tokenLimits', JSON.stringify(tokenLimits));
-    console.log("Saved token limits:", tokenLimits);
+    toast.success("Token limits saved");
   };
 
   const handleSaveChatSettings = async () => {
@@ -93,29 +87,27 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
   const renderChatSettings = () => (
     <div className="space-y-6">
       {isAdmin && (
-        <>
-          <div>
-            <Label htmlFor="instructions" className="text-sm font-medium text-foreground mb-1 block">
-              Custom Instructions
-            </Label>
-            <Textarea
-              id="instructions"
-              placeholder="Write specific guidance for the AI (tone, style, context)..."
-              value={chatSettings.customInstructions}
-              onChange={(e) => setChatSettings(prev => ({ ...prev, customInstructions: e.target.value }))}
-              className="min-h-[100px] resize-none border-border focus:border-nova-pink"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Controls AI behavior silently across the platform. Users will not see these instructions.
-            </p>
-            <Button 
-              onClick={handleSaveChatSettings} 
-              className="mt-2 w-full bg-nova-pink hover:bg-nova-pink/90 text-white"
-            >
-              Save Instructions
-            </Button>
-          </div>
-        </>
+        <div>
+          <Label htmlFor="instructions" className="text-sm font-medium text-foreground mb-1 block">
+            Custom Instructions
+          </Label>
+          <Textarea
+            id="instructions"
+            placeholder="Write specific guidance for the AI (tone, style, context)..."
+            value={chatSettings.customInstructions}
+            onChange={(e) => setChatSettings(prev => ({ ...prev, customInstructions: e.target.value }))}
+            className="min-h-[100px] resize-none border-border focus:border-nova-pink"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Controls AI behavior silently across the platform. Users will not see these instructions.
+          </p>
+          <Button 
+            onClick={handleSaveChatSettings} 
+            className="mt-2 w-full bg-nova-pink hover:bg-nova-pink/90 text-white"
+          >
+            Save Instructions
+          </Button>
+        </div>
       )}
 
       {isAdmin && (
@@ -154,7 +146,11 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
             </Button>
           </div>
         </div>
-      )} = () => (
+      )}
+    </div>
+  );
+
+  const renderAutomationSettings = () => (
     isAdmin && (
       <div className="space-y-6">
         <div>
@@ -187,10 +183,8 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
     )
   );
 
-
   return (
     <>
-      {/* Settings Toggle Button */}
       <Button
         onClick={onToggle}
         variant="ghost"
@@ -200,35 +194,32 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
         <Menu className={`h-5 w-5 transition-transform duration-300 ${isOpen ? 'rotate-45' : ''}`} />
       </Button>
 
-      {/* Settings Panel Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-40 flex">
-          {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-black/50" 
             onClick={onToggle}
           />
           
-          {/* Settings Panel */}
           <div className={`fixed right-0 top-0 h-full w-80 bg-background border-l border-border shadow-xl overflow-y-auto z-50 transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    Chatbot Settings
-                  </h2>
-                  <Button
-                    onClick={onToggle}
-                    variant="ghost"
-                    size="icon"
-                    className="hover:bg-accent"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="space-y-8">
-                  {renderChatSettings()}
-                  {renderAutomationSettings()}
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Chatbot Settings
+                </h2>
+                <Button
+                  onClick={onToggle}
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-accent"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="space-y-8">
+                {renderChatSettings()}
+                {renderAutomationSettings()}
+              </div>
             </div>
           </div>
         </div>
