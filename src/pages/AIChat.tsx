@@ -264,17 +264,17 @@ const AIChat = () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiConfig.api_key.trim()}`
               },
-              body: JSON.stringify({
-                model,
-                messages: [
-                  ...contentState[activeTab].map(m => ({
-                    role: m.isUser ? "user" : "assistant",
-                    content: m.text
-                  })),
-                  { role: "user", content: messageText }
-                ],
-                stream: true
-              }),
+                body: JSON.stringify({
+                  model,
+                  messages: [
+                    ...contentState[activeTab].slice(-10).map(m => ({
+                      role: m.isUser ? "user" : "assistant",
+                      content: m.text
+                    })),
+                    { role: "user", content: messageText }
+                  ],
+                  stream: true
+                }),
               signal: abortControllerRef.current.signal
             });
 
