@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShieldAlert } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -28,13 +28,16 @@ interface TokenLimits {
   chatTokensPerSession: number;
 }
 
-  const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStrictMode, isAdmin: propIsAdmin }: AISettingsPanelProps) => {
-    // Robust admin check: check prop first, then localStorage
-    const isAdmin = propIsAdmin || localStorage.getItem("isAdmin") === "true";
-
-    const [chatSettings, setChatSettings] = useState<ChatSettings>({
-      customInstructions: ""
-    });
+const AISettingsPanel = ({ 
+  isOpen, 
+  onToggle, 
+  isAdmin: propIsAdmin 
+}: AISettingsPanelProps) => {
+  const isAdmin = propIsAdmin || localStorage.getItem("isAdmin") === "true";
+  
+  const [chatSettings, setChatSettings] = useState<ChatSettings>({
+    customInstructions: ""
+  });
 
   const [tokenLimits, setTokenLimits] = useState<TokenLimits>({
     chatTokensPerDay: 10000,
@@ -50,21 +53,26 @@ interface TokenLimits {
   }, []);
 
   useEffect(() => {
-    if (isAdmin) {
+    if (isAdmin && isOpen) {
       const loadCustomInstructions = async () => {
-        const { data } = await supabase
-          .from('ai_config')
-          .select('custom_instructions')
-          .eq('id', 'global')
-          .single();
-        
-        if (data?.custom_instructions) {
-          setChatSettings(prev => ({ ...prev, customInstructions: data.custom_instructions }));
+        try {
+          const { data, error } = await supabase
+            .from('ai_config')
+            .select('custom_instructions')
+            .eq('id', 'global')
+            .maybeSingle();
+          
+          if (error) throw error;
+          if (data?.custom_instructions) {
+            setChatSettings(prev => ({ ...prev, customInstructions: data.custom_instructions }));
+          }
+        } catch (err) {
+          console.error("Error loading instructions:", err);
         }
       };
       loadCustomInstructions();
     }
-  }, [isAdmin]);
+  }, [isAdmin, isOpen]);
 
   const handleSaveTokenLimits = () => {
     localStorage.setItem('tokenLimits', JSON.stringify(tokenLimits));
@@ -72,118 +80,84 @@ interface TokenLimits {
   };
 
   const handleSaveChatSettings = async () => {
-    if (isAdmin) {
+    if (!isAdmin) return;
+    
+    try {
       const { error } = await supabase
         .from('ai_config')
         .update({ custom_instructions: chatSettings.customInstructions })
         .eq('id', 'global');
       
-      if (error) {
-        toast.error("Failed to save instructions");
-      } else {
-        toast.success("Custom instructions saved");
-        window.dispatchEvent(new CustomEvent('ai-config-update'));
-      }
+      if (error) throw error;
+      
+      toast.success("Custom instructions saved");
+      window.dispatchEvent(new CustomEvent('ai-config-update'));
+    } catch (error: any) {
+      toast.error(`Failed to save: ${error.message}`);
     }
   };
 
-  const renderChatSettings = () => (
-    <div className="space-y-6">
-      {isAdmin && (
-        <div>
-          <Label htmlFor="instructions" className="text-sm font-medium text-foreground mb-1 block">
-            Custom Instructions
-          </Label>
-          <Textarea
-            id="instructions"
-            placeholder="Write specific guidance for the AI (tone, style, context)..."
-            value={chatSettings.customInstructions}
-            onChange={(e) => setChatSettings(prev => ({ ...prev, customInstructions: e.target.value }))}
-            className="min-h-[100px] resize-none border-border focus:border-nova-pink"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Controls AI behavior silently across the platform. Users will not see these instructions.
-          </p>
+  const renderAdminSettings = () => (
+    <div className="space-y-8">
+      <section>
+        <Label htmlFor="instructions" className="text-sm font-semibold text-foreground mb-3 block">
+          Global Custom Instructions
+        </Label>
+        <Textarea
+          id="instructions"
+          placeholder="Write specific guidance for the AI (tone, style, context)..."
+          value={chatSettings.customInstructions}
+          onChange={(e) => setChatSettings(prev => ({ ...prev, customInstructions: e.target.value }))}
+          className="min-h-[150px] resize-none border-border focus:ring-1 focus:ring-nova-pink bg-background/50"
+        />
+        <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed italic">
+          These instructions control the AI behavior silently across the entire platform. Users will not see these settings.
+        </p>
+        <Button 
+          onClick={handleSaveChatSettings} 
+          className="mt-4 w-full bg-nova-pink hover:bg-nova-pink/90 text-white font-medium shadow-sm transition-all"
+        >
+          Save Global Instructions
+        </Button>
+      </section>
+
+      <div className="border-t border-border pt-6">
+        <h3 className="text-sm font-semibold text-foreground mb-4">Token Management</h3>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="chatPerDay" className="text-xs font-medium text-muted-foreground mb-1.5 block">
+              Daily Chat Tokens
+            </Label>
+            <Input
+              id="chatPerDay"
+              type="number"
+              value={tokenLimits.chatTokensPerDay}
+              onChange={(e) => setTokenLimits(prev => ({ ...prev, chatTokensPerDay: parseInt(e.target.value) || 0 }))}
+              className="h-9 bg-background/50 border-border"
+            />
+          </div>
+          <div>
+            <Label htmlFor="chatPerSession" className="text-xs font-medium text-muted-foreground mb-1.5 block">
+              Tokens Per Session
+            </Label>
+            <Input
+              id="chatPerSession"
+              type="number"
+              value={tokenLimits.chatTokensPerSession}
+              onChange={(e) => setTokenLimits(prev => ({ ...prev, chatTokensPerSession: parseInt(e.target.value) || 0 }))}
+              className="h-9 bg-background/50 border-border"
+            />
+          </div>
           <Button 
-            onClick={handleSaveChatSettings} 
-            className="mt-2 w-full bg-nova-pink hover:bg-nova-pink/90 text-white"
+            onClick={handleSaveTokenLimits} 
+            variant="outline"
+            className="w-full text-xs font-medium"
           >
-            Save Instructions
+            Save Token Limits
           </Button>
         </div>
-      )}
-
-      {isAdmin && (
-        <div className="border-t border-border pt-6">
-          <h3 className="text-sm font-semibold text-foreground mb-4">Chat Token Limits</h3>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="chatPerDay" className="text-xs font-medium text-foreground mb-1 block">
-                Tokens Per Day
-              </Label>
-              <Input
-                id="chatPerDay"
-                type="number"
-                value={tokenLimits.chatTokensPerDay}
-                onChange={(e) => setTokenLimits(prev => ({ ...prev, chatTokensPerDay: parseInt(e.target.value) || 0 }))}
-                className="h-9 border-border focus:border-nova-pink"
-              />
-            </div>
-            <div>
-              <Label htmlFor="chatPerSession" className="text-xs font-medium text-foreground mb-1 block">
-                Tokens Per Session
-              </Label>
-              <Input
-                id="chatPerSession"
-                type="number"
-                value={tokenLimits.chatTokensPerSession}
-                onChange={(e) => setTokenLimits(prev => ({ ...prev, chatTokensPerSession: parseInt(e.target.value) || 0 }))}
-                className="h-9 border-border focus:border-nova-pink"
-              />
-            </div>
-            <Button 
-              onClick={handleSaveTokenLimits} 
-              className="w-full bg-nova-pink hover:bg-nova-pink/90 text-white text-xs"
-            >
-              Save Chat Tokens
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  const renderAutomationSettings = () => (
-    isAdmin && (
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-4">Automation Token Limits</h3>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="autoPerDay" className="text-xs font-medium text-foreground mb-1 block">
-                Tokens Per Day
-              </Label>
-              <Input
-                id="autoPerDay"
-                type="number"
-                value={tokenLimits.automationTokensPerDay}
-                onChange={(e) => setTokenLimits(prev => ({ ...prev, automationTokensPerDay: parseInt(e.target.value) || 0 }))}
-                className="h-9 border-border focus:border-nova-pink"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Uses the same session limits as chat (per session limit is shared).
-              </p>
-            </div>
-            <Button 
-              onClick={handleSaveTokenLimits} 
-              className="w-full bg-nova-pink hover:bg-nova-pink/90 text-white text-xs"
-            >
-              Save Automation Tokens
-            </Button>
-          </div>
-        </div>
       </div>
-    )
+    </div>
   );
 
   return (
@@ -192,51 +166,54 @@ interface TokenLimits {
         onClick={onToggle}
         variant="ghost"
         size="icon"
-        className={`fixed top-4 right-4 z-50 transition-all duration-300 ${isOpen ? 'rotate-90 scale-110' : 'hover:scale-105'}`}
+        className={`fixed top-4 right-4 z-50 transition-all duration-300 ${isOpen ? 'rotate-90' : ''}`}
       >
-        <Menu className={`h-5 w-5 transition-transform duration-300 ${isOpen ? 'rotate-45' : ''}`} />
+        <Menu className="h-5 w-5" />
       </Button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-40 flex">
+        <div className="fixed inset-0 z-40 flex justify-end">
           <div 
-            className="fixed inset-0 bg-black/50" 
+            className="fixed inset-0 bg-black/20 backdrop-blur-[2px]" 
             onClick={onToggle}
           />
           
-          <div className={`fixed right-0 top-0 h-full w-80 bg-background border-l border-border shadow-xl overflow-y-auto z-50 transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Chatbot Settings
-                </h2>
-                <Button
-                  onClick={onToggle}
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-accent"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-                <div className="space-y-8">
-                  {isAdmin ? (
-                    <>
-                      {renderChatSettings()}
-                      {renderAutomationSettings()}
-                    </>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                        <Menu className="h-6 w-6 text-gray-400" />
-                      </div>
-                      <h3 className="text-sm font-medium text-foreground mb-1">Admin Access Required</h3>
-                      <p className="text-xs text-muted-foreground">
-                        You must be logged in as an administrator to access these settings.
-                      </p>
-                    </div>
-                  )}
+          <div className="relative h-full w-80 bg-background border-l border-border shadow-2xl overflow-y-auto z-50 flex flex-col">
+            <div className="p-5 border-b border-border flex items-center justify-between bg-background sticky top-0 z-10">
+              <h2 className="text-lg font-bold text-foreground">
+                AI Settings
+              </h2>
+              <Button
+                onClick={onToggle}
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="p-6 flex-1">
+              {isAdmin ? (
+                renderAdminSettings()
+              ) : (
+                <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+                  <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-6">
+                    <ShieldAlert className="h-8 w-8 text-red-500" />
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">Admin Access Only</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    You do not have permission to modify global AI configurations. 
+                    Please contact an administrator if you believe this is an error.
+                  </p>
                 </div>
+              )}
+            </div>
+            
+            <div className="p-4 border-t border-border bg-muted/30">
+              <p className="text-[10px] text-center text-muted-foreground uppercase tracking-wider font-semibold">
+                Platform Configuration v2.0
+              </p>
             </div>
           </div>
         </div>
@@ -246,4 +223,3 @@ interface TokenLimits {
 };
 
 export default AISettingsPanel;
-
