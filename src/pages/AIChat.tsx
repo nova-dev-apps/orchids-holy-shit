@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Brain, ArrowDown, Wrench, Hammer, Copy, RefreshCw, Check, ClipboardCopy } from "lucide-react";
 import { ChatInput, Attachment } from "@/components/ChatInput";
