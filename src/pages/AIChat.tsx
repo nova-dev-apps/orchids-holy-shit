@@ -168,8 +168,13 @@ const AIChat = () => {
                 </div>
               )}
                 {msg.text && (
-                  <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in whitespace-pre-wrap">
-                    {msg.text}
+                  <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in">
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      components={markdownComponents}
+                    >
+                      {msg.text}
+                    </ReactMarkdown>
                   </div>
                 )}
               
