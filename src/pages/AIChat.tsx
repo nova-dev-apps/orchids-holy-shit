@@ -165,13 +165,11 @@ const AIChat = () => {
                   )}
                 </div>
               )}
-              {msg.text && (
-                <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-strong:text-black prose-strong:font-bold">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                {msg.text && (
+                  <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in whitespace-pre-wrap">
                     {msg.text}
-                  </ReactMarkdown>
-                </div>
-              )}
+                  </div>
+                )}
               
               {isLast && currentPlan && isAutoMode && !isThinking && (
                 <AutomationPlan 
