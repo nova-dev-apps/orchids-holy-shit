@@ -21,10 +21,10 @@ interface OnboardingModalProps {
     
       useEffect(() => {
         const consent = localStorage.getItem("nova_automation_consent");
-        const isLocalAgent = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isOpenedAsFile = window.location.protocol === 'file:';
         
-        // Only pop up automatically if we're in the local agent context and consent hasn't been given
-        if (!consent && isLocalAgent && false) { // Set to false to disable auto-popup as requested
+        // Only pop up automatically if the file is opened directly (protocol is file:)
+        if (!consent && isOpenedAsFile) {
           setIsOpen(true);
         }
       }, []);
