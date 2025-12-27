@@ -39,7 +39,7 @@ const AIChat = () => {
   const [strictMode, setStrictMode] = useState(false);
   const [showScrollArrow, setShowScrollArrow] = useState(false);
   const [isAutoMode, setIsAutoMode] = useState(false);
-  const [apiConfig, setApiConfig] = useState<{api_key: string, endpoint_url: string, model: string, custom_instructions?: string} | null>(null);
+  const [apiConfig, setApiConfig] = useState<{api_key: string, endpoint_url: string, model: string, custom_instructions?: string, personal_instructions?: string} | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -187,15 +187,36 @@ const AIChat = () => {
 
   const fetchAiConfig = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Fetch Global Config
+      const { data: globalData, error: globalError } = await supabase
         .from('ai_config')
         .select('api_key, endpoint_url, model, custom_instructions')
         .eq('id', 'global')
         .single();
       
-      if (error) throw error;
-      if (data) {
-        setApiConfig(data);
+      if (globalError) throw globalError;
+      
+      let personalInstructions = "";
+      if (user) {
+        // Fetch User Personal Instructions
+        const { data: userData } = await supabase
+          .from('ai_config')
+          .select('custom_instructions')
+          .eq('id', user.id)
+          .maybeSingle();
+        
+        if (userData?.custom_instructions) {
+          personalInstructions = userData.custom_instructions;
+        }
+      }
+
+      if (globalData) {
+        setApiConfig({
+          ...globalData,
+          personal_instructions: personalInstructions
+        });
       }
     } catch (error) {
       console.error("Error fetching AI config in chat:", error);
