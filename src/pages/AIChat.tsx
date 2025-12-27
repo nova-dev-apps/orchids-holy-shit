@@ -717,81 +717,16 @@ const AIChat = () => {
                                     )}
                                 
                                   {/* Message Text */}
-                                  {msg.text && (
-                                    <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-strong:text-black prose-strong:font-bold">
-                                        <ReactMarkdown 
-                                          remarkPlugins={[remarkGfm]}
-                                          components={{
-                                            table: ({node, ...props}) => {
-                                              const tableRef = useRef<HTMLTableElement>(null);
-                                              const [isCopied, setIsCopied] = useState(false);
-
-                                              const handleCopyTable = () => {
-                                                if (!tableRef.current) return;
-                                                
-                                                let tableText = "";
-                                                const rows = tableRef.current.querySelectorAll("tr");
-                                                
-                                                rows.forEach((row, rowIndex) => {
-                                                  const cells = row.querySelectorAll("th, td");
-                                                  const cellTexts: string[] = [];
-                                                  cells.forEach(cell => {
-                                                    cellTexts.push(cell.textContent || "");
-                                                  });
-                                                  tableText += cellTexts.join("\t") + (rowIndex < rows.length - 1 ? "\n" : "");
-                                                });
-
-                                                const textArea = document.createElement("textarea");
-                                                textArea.value = tableText;
-                                                document.body.appendChild(textArea);
-                                                textArea.select();
-                                                try {
-                                                  document.execCommand('copy');
-                                                  setIsCopied(true);
-                                                  toast.success("Table copied to clipboard");
-                                                  setTimeout(() => setIsCopied(false), 2000);
-                                                } catch (err) {
-                                                  toast.error("Failed to copy table");
-                                                }
-                                                document.body.removeChild(textArea);
-                                              };
-
-                                              return (
-                                                <div className="group relative my-4 overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-white">
-                                                  <div className="absolute right-2 top-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button
-                                                      variant="outline"
-                                                      size="icon"
-                                                      className="h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white"
-                                                      onClick={handleCopyTable}
-                                                    >
-                                                      {isCopied ? (
-                                                        <Check className="h-4 w-4 text-green-500" />
-                                                      ) : (
-                                                        <ClipboardCopy className="h-4 w-4 text-gray-500" />
-                                                      )}
-                                                    </Button>
-                                                  </div>
-                                                  <div className="overflow-x-auto">
-                                                    <table ref={tableRef} className="min-w-full divide-y divide-gray-200" {...props} />
-                                                  </div>
-                                                </div>
-                                              );
-                                            },
-                                            thead: ({node, ...props}) => <thead className="bg-gray-50" {...props} />,
-                                          th: ({node, ...props}) => <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border-b" {...props} />,
-                                          td: ({node, ...props}) => <td className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100 last:border-b-0" {...props} />,
-                                          p: ({node, ...props}) => <p className="mb-3 last:mb-0" {...props} />,
-                                          strong: ({node, ...props}) => <strong className="font-bold text-black" {...props} />,
-                                          code: ({node, ...props}) => <code className="bg-gray-100 px-1 rounded text-nova-pink" {...props} />,
-                                          ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-3" {...props} />,
-                                          ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-3" {...props} />,
-                                        }}
-                                      >
-                                        {msg.text}
-                                      </ReactMarkdown>
-                                    </div>
-                                  )}
+                                    {msg.text && (
+                                      <div className="text-black text-base leading-relaxed max-w-[85%] break-words animate-blur-in prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-strong:text-black prose-strong:font-bold">
+                                          <ReactMarkdown 
+                                            remarkPlugins={[remarkGfm]}
+                                            components={markdownComponents}
+                                          >
+                                            {msg.text}
+                                          </ReactMarkdown>
+                                      </div>
+                                    )}
 
                               {/* Action Buttons - Only show when response is finished */}
                               {(!isThinking || msg.id !== currentMessages[currentMessages.length - 1].id) && msg.text && (
