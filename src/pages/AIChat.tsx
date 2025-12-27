@@ -877,8 +877,6 @@ const AIChat = () => {
           activeTab={activeTab} 
           isOpen={isSettingsOpen}
           onToggle={() => setIsSettingsOpen(!isSettingsOpen)}
-          strictMode={strictMode}
-          onToggleStrictMode={() => setStrictMode(!strictMode)}
           isAdmin={isAdmin}
         />
       )}
