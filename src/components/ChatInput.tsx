@@ -183,24 +183,20 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                   {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
                 </DropdownMenuItem>
               )}
-              {activeTab === 'chat' && (
-                <DropdownMenuItem
-                  onClick={() => {
-                    if (isMobileDevice()) {
-                      toast({
-                        title: "Desktop only",
-                        description: "The local agent is only available for desktop.",
-                        variant: "default",
-                        duration: 3000,
-                      });
-                      return;
-                    }
-                      const link = document.createElement('a');
-                      link.href = '/nova-agent-setup.exe';
-                      link.download = 'nova-agent-setup.exe';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
+                {activeTab === 'chat' && (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (isMobileDevice()) {
+                        toast({
+                          title: "Desktop only",
+                          description: "The local agent is only available for desktop.",
+                          variant: "default",
+                          duration: 3000,
+                        });
+                        return;
+                      }
+                      const downloadUrl = window.location.origin + '/nova-agent-setup.exe';
+                      window.parent.postMessage({ type: "OPEN_EXTERNAL_URL", data: { url: downloadUrl } }, "*");
                       toast({
                         title: "Download started",
                         description: "Nova Agent installer is downloading...",
@@ -208,14 +204,14 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                         duration: 3000,
                       });
                     }}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <Download className="w-4 h-4 text-nova-pink" />
-                  <div className="flex flex-col">
-                    <span className="font-medium">Download Agent</span>
-                  </div>
-                </DropdownMenuItem>
-              )}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Download className="w-4 h-4 text-nova-pink" />
+                    <div className="flex flex-col">
+                      <span className="font-medium">Download Agent</span>
+                    </div>
+                  </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
