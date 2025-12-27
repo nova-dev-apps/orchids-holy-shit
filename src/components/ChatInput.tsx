@@ -197,8 +197,8 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                             }
                             
                       // Download one-click installer PowerShell script
-                              const ps1Content = `# Nova Agent Installer for Windows
-# Run this script in PowerShell to automatically install NovaAgent.exe
+                      const ps1Content = `# Nova Agent Installer for Windows
+# Run this script in PowerShell to automatically install Python (if needed) and build NovaAgent.exe
 
 $ErrorActionPreference = "Stop"
 
@@ -225,6 +225,7 @@ try {
     Write-Host "[OK] Python installed!" -ForegroundColor Green
 }
 
+# Create temp directory for build
 $buildDir = "$env:TEMP\\nova-agent-build"
 if (Test-Path $buildDir) { Remove-Item -Recurse -Force $buildDir }
 New-Item -ItemType Directory -Path $buildDir | Out-Null
@@ -237,9 +238,9 @@ Write-Host "[OK] Dependencies installed!" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "[*] Creating Nova Agent script..." -ForegroundColor Cyan
-`;
 
-                              const pyContent = `import json
+$scriptContent = @'
+import json
 import os
 import subprocess
 import threading
@@ -526,11 +527,6 @@ if __name__ == "__main__":
 
     threading.Thread(target=start_server, daemon=True).start()
     run_control_panel()
-`;
-
-                              const fullPs1 = ps1Content + `
-$scriptContent = @'
-` + pyContent + `
 '@
 
 $scriptPath = "$buildDir\\nova-agent.py"
@@ -560,20 +556,25 @@ if (Test-Path $exePath) {
 }
 `;
 
-                              const ps1Blob = new Blob([fullPs1], { type: 'text/plain' });
-                              const ps1Url = URL.createObjectURL(ps1Blob);
-                              const ps1Link = document.createElement('a');
-                              ps1Link.href = ps1Url;
-                              ps1Link.download = 'Install-NovaAgent.ps1';
-                              ps1Link.click();
-                              URL.revokeObjectURL(ps1Url);
-                              
-                              toast({
-                                title: "Installer downloaded!",
-                                description: "Right-click Install-NovaAgent.ps1 → Run with PowerShell",
-                                variant: "default",
-                                duration: 8000,
-                              });
+                      const ps1Blob = new Blob([ps1Content], { type: 'text/plain' });
+                      const ps1Url = URL.createObjectURL(ps1Blob);
+                      
+                      // Robust download method: create hidden link and click
+                      const link = document.createElement('a');
+                      link.href = ps1Url;
+                      link.download = 'Install-NovaAgent.ps1';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      URL.revokeObjectURL(ps1Url);
+                      
+                      toast({
+                        title: "Installer downloaded!",
+                        description: "Right-click Install-NovaAgent.ps1 → Run with PowerShell",
+                        variant: "default",
+                        duration: 8000,
+                      });
+
                           }}
                           className="flex items-center gap-2 cursor-pointer"
                         >
