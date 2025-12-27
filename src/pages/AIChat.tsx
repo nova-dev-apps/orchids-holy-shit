@@ -9,8 +9,6 @@ import { OnboardingModal } from "@/components/OnboardingModal";
 import { AutomationPlan, PlanStep } from "@/components/AutomationPlan";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 type ContentType = 'chat';
 
