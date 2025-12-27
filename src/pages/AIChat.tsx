@@ -118,7 +118,7 @@ const AIChat = () => {
     try {
       const { data, error } = await supabase
         .from('ai_config')
-        .select('api_key, endpoint_url, model')
+        .select('api_key, endpoint_url, model, custom_instructions')
         .eq('id', 'global')
         .single();
       
