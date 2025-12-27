@@ -17,7 +17,7 @@ try {
 } catch {
     Write-Host "[!] Python not found. Installing..." -ForegroundColor Yellow
     
-    # Download Python installer
+    # Download Python installer (3.11 for stability)
     $installerUrl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
     $installerPath = "$env:TEMP\python-installer.exe"
     
@@ -27,7 +27,7 @@ try {
     Write-Host "    Installing Python (this may take a minute)..." -ForegroundColor Gray
     Start-Process -FilePath $installerPath -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1 Include_test=0" -Wait
     
-    # Refresh PATH
+    # Refresh PATH for the current session
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
     
     Write-Host "[OK] Python installed!" -ForegroundColor Green
@@ -40,14 +40,11 @@ New-Item -ItemType Directory -Path $buildDir | Out-Null
 
 Write-Host ""
 Write-Host "[*] Installing PyInstaller and dependencies..." -ForegroundColor Cyan
-python -m pip install --upgrade pip --quiet
-python -m pip install pyinstaller pyperclip --quiet
+python -m pip install --upgrade pip --quiet 2>$null
+python -m pip install pyinstaller pyperclip --quiet 2>$null
 Write-Host "[OK] Dependencies installed!" -ForegroundColor Green
 
-# Download the Python script
-Write-Host ""
-Write-Host "[*] Downloading Nova Agent script..." -ForegroundColor Cyan
-$scriptUrl = "https://raw.githubusercontent.com/YOUR_REPO/main/public/nova-agent.py"
+# The Python script content
 $scriptContent = @'
 import json
 import os
@@ -87,11 +84,11 @@ def require_consent():
              bg="#0a0a0a", fg="#888").pack(pady=(0, 20))
 
     permissions = [
-        "Execute AI-generated automation plans locally",
-        "Access files and folders on your device",
-        "Copy/paste to clipboard",
-        "Open URLs and applications",
-        "Run shell commands when approved",
+        "• Execute AI-generated automation plans locally",
+        "• Access files and folders on your device",
+        "• Copy/paste to clipboard",
+        "• Open URLs and applications",
+        "• Run shell commands when approved",
     ]
     
     frame = tk.Frame(root, bg="#1a1a1a", padx=20, pady=15)
@@ -101,7 +98,7 @@ def require_consent():
              bg="#1a1a1a", fg="white", anchor="w").pack(fill="x")
     
     for p in permissions:
-        tk.Label(frame, text=f"  {p}", font=("Segoe UI", 9), bg="#1a1a1a", 
+        tk.Label(frame, text=p, font=("Segoe UI", 9), bg="#1a1a1a", 
                  fg="#ccc", anchor="w").pack(fill="x", pady=1)
 
     tk.Label(root, text="You control everything. Stop anytime by closing this app.",
@@ -368,13 +365,10 @@ if (Test-Path $exePath) {
     # Cleanup
     Remove-Item -Recurse -Force $buildDir -ErrorAction SilentlyContinue
     
-    # Ask to run
-    $run = Read-Host "Run NovaAgent now? (y/n)"
-    if ($run -eq "y") {
-        Start-Process "$desktopPath\NovaAgent.exe"
-    }
+    # Run it
+    Start-Process "$desktopPath\NovaAgent.exe"
 } else {
-    Write-Host "[ERROR] Build failed. Please try again." -ForegroundColor Red
+    Write-Host "[ERROR] Build failed. Please ensure you have an active internet connection." -ForegroundColor Red
 }
 
 Write-Host ""
