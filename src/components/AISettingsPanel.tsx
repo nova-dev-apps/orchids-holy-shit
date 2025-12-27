@@ -51,13 +51,43 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
     }
   }, []);
 
+  // Load custom instructions from Supabase (admin only)
+  useEffect(() => {
+    if (isAdmin) {
+      const loadCustomInstructions = async () => {
+        const { data } = await supabase
+          .from('ai_config')
+          .select('custom_instructions')
+          .eq('id', 'global')
+          .single();
+        
+        if (data?.custom_instructions) {
+          setChatSettings(prev => ({ ...prev, customInstructions: data.custom_instructions }));
+        }
+      };
+      loadCustomInstructions();
+    }
+  }, [isAdmin]);
+
   const handleSaveTokenLimits = () => {
     localStorage.setItem('tokenLimits', JSON.stringify(tokenLimits));
     console.log("Saved token limits:", tokenLimits);
   };
 
-  const handleSaveChatSettings = () => {
-    console.log("Saving chat settings:", chatSettings);
+  const handleSaveChatSettings = async () => {
+    if (isAdmin) {
+      const { error } = await supabase
+        .from('ai_config')
+        .update({ custom_instructions: chatSettings.customInstructions })
+        .eq('id', 'global');
+      
+      if (error) {
+        toast.error("Failed to save instructions");
+      } else {
+        toast.success("Custom instructions saved");
+        window.dispatchEvent(new CustomEvent('ai-config-update'));
+      }
+    }
   };
 
   const renderChatSettings = () => (
