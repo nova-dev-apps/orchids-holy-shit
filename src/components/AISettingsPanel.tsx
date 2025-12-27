@@ -95,44 +95,28 @@ const AISettingsPanel = ({ activeTab, isOpen, onToggle, strictMode, onToggleStri
       {isAdmin && (
         <>
           <div>
-            <Label htmlFor="aiInstructions" className="text-sm font-medium text-foreground mb-1 block">
-              AI Instructions
+            <Label htmlFor="instructions" className="text-sm font-medium text-foreground mb-1 block">
+              Custom Instructions
             </Label>
             <Textarea
-              id="aiInstructions"
-              placeholder="Give instructions to the AI..."
-              value={chatSettings.aiInstructions || ""}
-              onChange={(e) => setChatSettings(prev => ({ ...prev, aiInstructions: e.target.value }))}
+              id="instructions"
+              placeholder="Write specific guidance for the AI (tone, style, context)..."
+              value={chatSettings.customInstructions}
+              onChange={(e) => setChatSettings(prev => ({ ...prev, customInstructions: e.target.value }))}
               className="min-h-[100px] resize-none border-border focus:border-nova-pink"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Admin only. Affects your personal AI behavior.
+              Controls AI behavior silently across the platform. Users will not see these instructions.
             </p>
+            <Button 
+              onClick={handleSaveChatSettings} 
+              className="mt-2 w-full bg-nova-pink hover:bg-nova-pink/90 text-white"
+            >
+              Save Instructions
+            </Button>
           </div>
         </>
       )}
-
-      <div>
-        <Label htmlFor="instructions" className="text-sm font-medium text-foreground mb-1 block">
-          Custom Instructions
-        </Label>
-        <Textarea
-          id="instructions"
-          placeholder="Write specific guidance for the AI (tone, style, context)..."
-          value={chatSettings.customInstructions}
-          onChange={(e) => setChatSettings(prev => ({ ...prev, customInstructions: e.target.value }))}
-          className="min-h-[100px] resize-none border-border focus:border-nova-pink"
-        />
-        <p className="text-xs text-muted-foreground mt-1">
-          Affects only the current chat session.
-        </p>
-        <Button 
-          onClick={handleSaveChatSettings} 
-          className="mt-2 w-full bg-nova-pink hover:bg-nova-pink/90 text-white"
-        >
-          Save Instructions
-        </Button>
-      </div>
 
       {isAdmin && (
         <div className="border-t border-border pt-6">
