@@ -39,7 +39,7 @@ const AIChat = () => {
   const [strictMode, setStrictMode] = useState(false);
   const [showScrollArrow, setShowScrollArrow] = useState(false);
   const [isAutoMode, setIsAutoMode] = useState(false);
-  const [apiConfig, setApiConfig] = useState<{api_key: string, endpoint_url: string, model: string} | null>(null);
+  const [apiConfig, setApiConfig] = useState<{api_key: string, endpoint_url: string, model: string, custom_instructions?: string} | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
