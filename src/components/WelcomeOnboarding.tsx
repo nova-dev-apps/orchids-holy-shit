@@ -162,8 +162,8 @@ export function WelcomeOnboarding({ open, onOpenChange }: WelcomeOnboardingProps
                   {
                     icon: Lock,
                     color: 'bg-amber-100 text-amber-600',
-                    title: 'Permission Rules',
-                    desc: 'The agent validates all actions against strict safety rules before executing.',
+                      title: 'Safety Rules',
+                      desc: 'The agent validates all actions against safety rules before executing.',
                   },
                 ].map(({ icon: Icon, color, title, desc }) => (
                   <div key={title} className="flex gap-4">
