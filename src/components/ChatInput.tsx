@@ -183,407 +183,154 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                   {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
                 </DropdownMenuItem>
               )}
-                      {activeTab === 'chat' && (
-                        <DropdownMenuItem
-                          onClick={() => {
-                            if (isMobileDevice()) {
-                              toast({
-                                title: "Desktop only",
-                                description: "The local agent is only available for desktop.",
-                                variant: "default",
-                                duration: 3000,
-                              });
-                              return;
-                            }
-                            
-                      // Download one-click installer PowerShell script
-                      const ps1Content = `# Nova Agent Installer for Windows
-# Run this script in PowerShell to automatically install Python (if needed) and build NovaAgent.exe
-
+                        {activeTab === 'chat' && (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              if (isMobileDevice()) {
+                                toast({
+                                  title: "Desktop only",
+                                  description: "The local agent is only available for desktop.",
+                                  variant: "default",
+                                  duration: 3000,
+                                });
+                                return;
+                              }
+                              
+                              const ps1Content = `# Nova Agent One-Click Installer
 $ErrorActionPreference = "Stop"
-
-Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "     Nova Agent Installer for Windows    " -ForegroundColor Cyan
-Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host ""
-
-# Check if Python is installed
-$pythonPath = $null
+Write-Host "Nova Agent Installer" -ForegroundColor Cyan
 try {
-    $pythonPath = (Get-Command python -ErrorAction SilentlyContinue).Source
-    $pythonVersion = python --version 2>&1
-    Write-Host "[OK] Python found: $pythonVersion" -ForegroundColor Green
+    $p = (Get-Command python -EA SilentlyContinue).Source
+    Write-Host "Python found" -ForegroundColor Green
 } catch {
-    Write-Host "[!] Python not found. Installing..." -ForegroundColor Yellow
-    $installerUrl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
-    $installerPath = "$env:TEMP\\python-installer.exe"
-    Write-Host "    Downloading Python..." -ForegroundColor Gray
-    Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
-    Write-Host "    Installing Python..." -ForegroundColor Gray
-    Start-Process -FilePath $installerPath -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1 Include_test=0" -Wait
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-    Write-Host "[OK] Python installed!" -ForegroundColor Green
+    Write-Host "Installing Python..." -ForegroundColor Yellow
+    $u = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
+    Invoke-WebRequest -Uri $u -OutFile "$env:TEMP\\py.exe"
+    Start-Process "$env:TEMP\\py.exe" "/quiet PrependPath=1" -Wait
+    $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
 }
-
-# Create temp directory for build
-$buildDir = "$env:TEMP\\nova-agent-build"
-if (Test-Path $buildDir) { Remove-Item -Recurse -Force $buildDir }
-New-Item -ItemType Directory -Path $buildDir | Out-Null
-
-Write-Host ""
-Write-Host "[*] Installing dependencies..." -ForegroundColor Cyan
-python -m pip install --upgrade pip --quiet 2>$null
-python -m pip install pyinstaller pyperclip --quiet 2>$null
-Write-Host "[OK] Dependencies installed!" -ForegroundColor Green
-
-Write-Host ""
-Write-Host "[*] Creating Nova Agent script..." -ForegroundColor Cyan
-
-$scriptContent = @'
-import json
-import os
-import subprocess
-import threading
-import webbrowser
-import pyperclip
-from http.server import BaseHTTPRequestHandler, HTTPServer
+$d = "$env:TEMP\\nova-build"
+Remove-Item $d -Recurse -Force -EA SilentlyContinue
+mkdir $d | Out-Null
+python -m pip install pyinstaller pyperclip -q
+@'
+import json,os,subprocess,threading,webbrowser,pyperclip
+from http.server import BaseHTTPRequestHandler,HTTPServer
 import tkinter as tk
-from tkinter import messagebox, ttk
-
-CONSENT_FILE = "nova_consent.accepted"
-PORT = 5050
-automation_enabled = False
-stop_requested = False
-
-def require_consent():
-    if os.path.exists(CONSENT_FILE):
-        return True
-
-    root = tk.Tk()
-    root.title("Nova - Local Agent Setup")
-    root.geometry("520x380")
-    root.resizable(False, False)
-    root.configure(bg="#0a0a0a")
-
-    agreed = tk.BooleanVar()
-    result = {"consented": False}
-
-    style = ttk.Style()
-    style.configure("Dark.TCheckbutton", background="#0a0a0a", foreground="white")
-
-    tk.Label(root, text="Nova Local Agent", font=("Segoe UI", 18, "bold"), 
-             bg="#0a0a0a", fg="white").pack(pady=(20, 5))
-    
-    tk.Label(root, text="Your Intelligent Automation Partner", font=("Segoe UI", 10), 
-             bg="#0a0a0a", fg="#888").pack(pady=(0, 20))
-
-    permissions = [
-        "• Execute AI-generated automation plans locally",
-        "• Access files and folders on your device",
-        "• Copy/paste to clipboard",
-        "• Open URLs and applications",
-        "• Run shell commands when approved",
-    ]
-    
-    frame = tk.Frame(root, bg="#1a1a1a", padx=20, pady=15)
-    frame.pack(padx=20, fill="x")
-    
-    tk.Label(frame, text="This agent will:", font=("Segoe UI", 10, "bold"),
-             bg="#1a1a1a", fg="white", anchor="w").pack(fill="x")
-    
-    for p in permissions:
-        tk.Label(frame, text=p, font=("Segoe UI", 9), bg="#1a1a1a", 
-                 fg="#ccc", anchor="w").pack(fill="x", pady=1)
-
-    tk.Label(root, text="You control everything. Stop anytime by closing this app.",
-             font=("Segoe UI", 9), bg="#0a0a0a", fg="#666").pack(pady=15)
-
-    cb = tk.Checkbutton(root, text="I give explicit consent to run this agent",
-                        variable=agreed, bg="#0a0a0a", fg="white",
-                        selectcolor="#333", activebackground="#0a0a0a",
-                        activeforeground="white", font=("Segoe UI", 10))
-    cb.pack()
-
-    def confirm():
-        if agreed.get():
-            with open(CONSENT_FILE, "w") as f:
-                f.write("consented")
-            result["consented"] = True
-            root.destroy()
-        else:
-            messagebox.showerror("Consent Required", "You must check the consent box to continue.")
-
-    def decline():
-        root.destroy()
-
-    btn_frame = tk.Frame(root, bg="#0a0a0a")
-    btn_frame.pack(pady=20)
-
-    tk.Button(btn_frame, text="Decline", command=decline, width=12,
-              bg="#333", fg="white", relief="flat", font=("Segoe UI", 10)).pack(side="left", padx=5)
-    tk.Button(btn_frame, text="Accept & Continue", command=confirm, width=15,
-              bg="#3b82f6", fg="white", relief="flat", font=("Segoe UI", 10, "bold")).pack(side="left", padx=5)
-
-    root.mainloop()
-    return result["consented"]
-
-def execute_step(step):
-    global stop_requested
-    if stop_requested:
-        return {"step": step, "status": "stopped", "error": "User stopped execution"}
-
-    action = step.get("action", "").lower()
-    params = step.get("params", {})
-
+from tkinter import messagebox,ttk
+CF="nova_consent.accepted"
+PORT=5050
+ae=False
+sr=False
+def consent():
+    if os.path.exists(CF):return True
+    r=tk.Tk();r.title("Nova Agent Setup");r.geometry("520x380");r.resizable(0,0);r.configure(bg="#0a0a0a")
+    a=tk.BooleanVar();res={"c":False}
+    tk.Label(r,text="Nova Local Agent",font=("Segoe UI",18,"bold"),bg="#0a0a0a",fg="white").pack(pady=(20,5))
+    tk.Label(r,text="Your Automation Partner",font=("Segoe UI",10),bg="#0a0a0a",fg="#888").pack(pady=(0,20))
+    f=tk.Frame(r,bg="#1a1a1a",padx=20,pady=15);f.pack(padx=20,fill="x")
+    tk.Label(f,text="This agent will:",font=("Segoe UI",10,"bold"),bg="#1a1a1a",fg="white",anchor="w").pack(fill="x")
+    for p in["Execute automation plans","Access files","Copy/paste clipboard","Open URLs/apps","Run commands"]:tk.Label(f,text="* "+p,font=("Segoe UI",9),bg="#1a1a1a",fg="#ccc",anchor="w").pack(fill="x",pady=1)
+    tk.Label(r,text="You control everything. Close app to stop.",font=("Segoe UI",9),bg="#0a0a0a",fg="#666").pack(pady=15)
+    cb=tk.Checkbutton(r,text="I consent to run this agent",variable=a,bg="#0a0a0a",fg="white",selectcolor="#333",font=("Segoe UI",10));cb.pack()
+    def ok():
+        if a.get():open(CF,"w").write("ok");res["c"]=True;r.destroy()
+        else:messagebox.showerror("Required","Check consent box")
+    bf=tk.Frame(r,bg="#0a0a0a");bf.pack(pady=20)
+    tk.Button(bf,text="Decline",command=r.destroy,width=12,bg="#333",fg="white",relief="flat").pack(side="left",padx=5)
+    tk.Button(bf,text="Accept",command=ok,width=15,bg="#3b82f6",fg="white",relief="flat",font=("Segoe UI",10,"bold")).pack(side="left",padx=5)
+    r.mainloop();return res["c"]
+def exe(s):
+    global sr
+    if sr:return{"step":s,"status":"stopped"}
+    a=s.get("action","").lower();p=s.get("params",{})
     try:
-        if action == "open_url":
-            url = params.get("url", "")
-            webbrowser.open(url)
-            return {"step": step, "status": "done", "result": f"Opened {url}"}
-
-        elif action == "open_app":
-            app = params.get("app", "")
-            if os.name == "nt":
-                os.startfile(app)
-            else:
-                subprocess.Popen([app])
-            return {"step": step, "status": "done", "result": f"Opened {app}"}
-
-        elif action == "copy_to_clipboard":
-            text = params.get("text", "")
-            pyperclip.copy(text)
-            return {"step": step, "status": "done", "result": "Copied to clipboard"}
-
-        elif action == "read_file":
-            path = params.get("path", "")
-            with open(path, "r", encoding="utf-8") as f:
-                content = f.read()
-            return {"step": step, "status": "done", "result": content[:1000]}
-
-        elif action == "write_file":
-            path = params.get("path", "")
-            content = params.get("content", "")
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(content)
-            return {"step": step, "status": "done", "result": f"Wrote to {path}"}
-
-        elif action == "list_files":
-            path = params.get("path", ".")
-            files = os.listdir(path)
-            return {"step": step, "status": "done", "result": files}
-
-        elif action == "run_command":
-            cmd = params.get("command", "")
-            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
-            return {"step": step, "status": "done", "result": result.stdout or result.stderr}
-
-        elif action == "wait":
-            import time
-            seconds = params.get("seconds", 1)
-            time.sleep(seconds)
-            return {"step": step, "status": "done", "result": f"Waited {seconds}s"}
-
-        else:
-            return {"step": step, "status": "error", "error": f"Unknown action: {action}"}
-
-    except Exception as e:
-        return {"step": step, "status": "error", "error": str(e)}
-
-class AgentHandler(BaseHTTPRequestHandler):
-    def send_cors_headers(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_cors_headers()
-        self.end_headers()
-
-    def do_GET(self):
-        if self.path == "/status":
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_cors_headers()
-            self.end_headers()
-            self.wfile.write(json.dumps({
-                "status": "running",
-                "automation_enabled": automation_enabled,
-                "version": "1.0.0"
-            }).encode())
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-    def do_POST(self):
-        global stop_requested
-
-        if self.path == "/execute":
-            if not automation_enabled:
-                self.send_response(403)
-                self.send_header("Content-Type", "application/json")
-                self.send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps({
-                    "status": "error",
-                    "error": "Automation mode is disabled"
-                }).encode())
-                return
-
-            length = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(length)
-            payload = json.loads(body.decode())
-            steps = payload.get("steps", [])
-
-            stop_requested = False
-            results = []
-
-            for step in steps:
-                if stop_requested:
-                    results.append({"step": step, "status": "stopped"})
-                    break
-                result = execute_step(step)
-                results.append(result)
-
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_cors_headers()
-            self.end_headers()
-            self.wfile.write(json.dumps({
-                "status": "completed",
-                "results": results
-            }).encode())
-
-        elif self.path == "/stop":
-            stop_requested = True
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_cors_headers()
-            self.end_headers()
-            self.wfile.write(json.dumps({"status": "stopped"}).encode())
-
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-    def log_message(self, format, *args):
-        pass
-
-def start_server():
-    server = HTTPServer(("localhost", PORT), AgentHandler)
-    print(f"Nova Agent running on http://localhost:{PORT}")
-    server.serve_forever()
-
-def run_control_panel():
-    global automation_enabled, stop_requested
-
-    root = tk.Tk()
-    root.title("Nova Agent")
-    root.geometry("300x200")
-    root.resizable(False, False)
-    root.configure(bg="#0a0a0a")
-
-    tk.Label(root, text="Nova Agent", font=("Segoe UI", 14, "bold"),
-             bg="#0a0a0a", fg="white").pack(pady=(15, 5))
-
-    status_label = tk.Label(root, text="Status: Idle", font=("Segoe UI", 10),
-                            bg="#0a0a0a", fg="#888")
-    status_label.pack()
-
-    def toggle_automation():
-        global automation_enabled
-        automation_enabled = not automation_enabled
-        if automation_enabled:
-            toggle_btn.configure(text="Disable Automation", bg="#ef4444")
-            status_label.configure(text="Status: ACTIVE", fg="#22c55e")
-        else:
-            toggle_btn.configure(text="Enable Automation", bg="#3b82f6")
-            status_label.configure(text="Status: Idle", fg="#888")
-
-    def stop_execution():
-        global stop_requested
-        stop_requested = True
-        status_label.configure(text="Status: Stopped", fg="#f59e0b")
-
-    toggle_btn = tk.Button(root, text="Enable Automation", command=toggle_automation,
-                           width=20, bg="#3b82f6", fg="white", relief="flat",
-                           font=("Segoe UI", 10, "bold"))
-    toggle_btn.pack(pady=15)
-
-    tk.Button(root, text="Stop Current Task", command=stop_execution,
-              width=20, bg="#333", fg="white", relief="flat",
-              font=("Segoe UI", 9)).pack()
-
-    tk.Label(root, text=f"Listening on localhost:{PORT}", font=("Segoe UI", 8),
-             bg="#0a0a0a", fg="#555").pack(pady=15)
-
-    root.protocol("WM_DELETE_WINDOW", lambda: (root.destroy(), os._exit(0)))
-    root.mainloop()
-
-if __name__ == "__main__":
-    if not require_consent():
-        print("Consent declined. Exiting.")
-        exit(0)
-
-    threading.Thread(target=start_server, daemon=True).start()
-    run_control_panel()
-'@
-
-$scriptPath = "$buildDir\\nova-agent.py"
-$scriptContent | Out-File -FilePath $scriptPath -Encoding utf8
-Write-Host "[OK] Script ready!" -ForegroundColor Green
-
-Write-Host ""
-Write-Host "[*] Building NovaAgent.exe (1-2 minutes)..." -ForegroundColor Cyan
-Push-Location $buildDir
-python -m PyInstaller --onefile --noconsole --name NovaAgent nova-agent.py 2>&1 | Out-Null
+        if a=="open_url":webbrowser.open(p.get("url",""));return{"step":s,"status":"done"}
+        elif a=="open_app":os.startfile(p.get("app","")) if os.name=="nt" else subprocess.Popen([p.get("app","")]);return{"step":s,"status":"done"}
+        elif a=="copy_to_clipboard":pyperclip.copy(p.get("text",""));return{"step":s,"status":"done"}
+        elif a=="read_file":return{"step":s,"status":"done","result":open(p.get("path",""),"r").read()[:1000]}
+        elif a=="write_file":open(p.get("path",""),"w").write(p.get("content",""));return{"step":s,"status":"done"}
+        elif a=="list_files":return{"step":s,"status":"done","result":os.listdir(p.get("path","."))}
+        elif a=="run_command":r=subprocess.run(p.get("command",""),shell=1,capture_output=1,text=1,timeout=30);return{"step":s,"status":"done","result":r.stdout or r.stderr}
+        elif a=="wait":import time;time.sleep(p.get("seconds",1));return{"step":s,"status":"done"}
+        return{"step":s,"status":"error","error":"Unknown: "+a}
+    except Exception as e:return{"step":s,"status":"error","error":str(e)}
+class H(BaseHTTPRequestHandler):
+    def cors(s):s.send_header("Access-Control-Allow-Origin","*");s.send_header("Access-Control-Allow-Methods","GET,POST,OPTIONS");s.send_header("Access-Control-Allow-Headers","Content-Type")
+    def do_OPTIONS(s):s.send_response(200);s.cors();s.end_headers()
+    def do_GET(s):
+        if s.path=="/status":s.send_response(200);s.send_header("Content-Type","application/json");s.cors();s.end_headers();s.wfile.write(json.dumps({"status":"running","automation_enabled":ae}).encode())
+        else:s.send_response(404);s.end_headers()
+    def do_POST(s):
+        global sr
+        if s.path=="/execute":
+            if not ae:s.send_response(403);s.send_header("Content-Type","application/json");s.cors();s.end_headers();s.wfile.write(json.dumps({"error":"disabled"}).encode());return
+            b=s.rfile.read(int(s.headers.get("Content-Length",0)));st=json.loads(b).get("steps",[]);sr=False;res=[exe(x) for x in st]
+            s.send_response(200);s.send_header("Content-Type","application/json");s.cors();s.end_headers();s.wfile.write(json.dumps({"status":"done","results":res}).encode())
+        elif s.path=="/stop":sr=True;s.send_response(200);s.send_header("Content-Type","application/json");s.cors();s.end_headers();s.wfile.write(json.dumps({"status":"stopped"}).encode())
+        else:s.send_response(404);s.end_headers()
+    def log_message(s,*a):pass
+def srv():HTTPServer(("localhost",PORT),H).serve_forever()
+def ui():
+    global ae,sr
+    r=tk.Tk();r.title("Nova Agent");r.geometry("300x200");r.resizable(0,0);r.configure(bg="#0a0a0a")
+    tk.Label(r,text="Nova Agent",font=("Segoe UI",14,"bold"),bg="#0a0a0a",fg="white").pack(pady=(15,5))
+    st=tk.Label(r,text="Status: Idle",font=("Segoe UI",10),bg="#0a0a0a",fg="#888");st.pack()
+    def tog():
+        global ae;ae=not ae
+        tb.configure(text="Disable" if ae else "Enable",bg="#ef4444" if ae else "#3b82f6")
+        st.configure(text="ACTIVE" if ae else "Idle",fg="#22c55e" if ae else "#888")
+    def stp():global sr;sr=True;st.configure(text="Stopped",fg="#f59e0b")
+    tb=tk.Button(r,text="Enable",command=tog,width=20,bg="#3b82f6",fg="white",relief="flat",font=("Segoe UI",10,"bold"));tb.pack(pady=15)
+    tk.Button(r,text="Stop Task",command=stp,width=20,bg="#333",fg="white",relief="flat").pack()
+    tk.Label(r,text=f"localhost:{PORT}",font=("Segoe UI",8),bg="#0a0a0a",fg="#555").pack(pady=15)
+    r.protocol("WM_DELETE_WINDOW",lambda:(r.destroy(),os._exit(0)));r.mainloop()
+if __name__=="__main__":
+    if not consent():exit(0)
+    threading.Thread(target=srv,daemon=1).start();ui()
+'@ | Out-File "$d\\agent.py" -Encoding utf8
+Push-Location $d
+python -m PyInstaller --onefile --noconsole --name NovaAgent agent.py 2>&1 | Out-Null
 Pop-Location
-
-$desktopPath = [Environment]::GetFolderPath("Desktop")
-$exePath = "$buildDir\\dist\\NovaAgent.exe"
-
-if (Test-Path $exePath) {
-    Copy-Item $exePath "$desktopPath\\NovaAgent.exe" -Force
-    Write-Host ""
-    Write-Host "==========================================" -ForegroundColor Green
-    Write-Host "  SUCCESS! NovaAgent.exe on Desktop!     " -ForegroundColor Green
-    Write-Host "==========================================" -ForegroundColor Green
-    Write-Host ""
-    Remove-Item -Recurse -Force $buildDir -ErrorAction SilentlyContinue
-    Start-Process "$desktopPath\\NovaAgent.exe"
-} else {
-    Write-Host "[ERROR] Build failed." -ForegroundColor Red
-}
+$desk = [Environment]::GetFolderPath("Desktop")
+if (Test-Path "$d\\dist\\NovaAgent.exe") {
+    Copy-Item "$d\\dist\\NovaAgent.exe" "$desk\\NovaAgent.exe" -Force
+    Write-Host "SUCCESS! NovaAgent.exe on Desktop" -ForegroundColor Green
+    Start-Process "$desk\\NovaAgent.exe"
+} else { Write-Host "Build failed" -ForegroundColor Red }
+Remove-Item $d -Recurse -Force -EA SilentlyContinue
 `;
-
-                      const ps1Blob = new Blob([ps1Content], { type: 'text/plain' });
-                      const ps1Url = URL.createObjectURL(ps1Blob);
-                      
-                      // Robust download method: create hidden link and click
-                      const link = document.createElement('a');
-                      link.href = ps1Url;
-                      link.download = 'Install-NovaAgent.ps1';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                      URL.revokeObjectURL(ps1Url);
-                      
-                      toast({
-                        title: "Installer downloaded!",
-                        description: "Right-click Install-NovaAgent.ps1 → Run with PowerShell",
-                        variant: "default",
-                        duration: 8000,
-                      });
-
-                          }}
-                          className="flex items-center gap-2 cursor-pointer"
-                        >
-                          <Download className="w-4 h-4 text-nova-pink" />
-                          <div className="flex flex-col">
+                              
+                              const blob = new Blob([ps1Content], { type: 'application/octet-stream' });
+                              const url = URL.createObjectURL(blob);
+                              
+                              const a = document.createElement('a');
+                              a.style.display = 'none';
+                              a.href = url;
+                              a.download = 'Install-NovaAgent.ps1';
+                              
+                              document.body.appendChild(a);
+                              
+                              setTimeout(() => {
+                                a.click();
+                                setTimeout(() => {
+                                  document.body.removeChild(a);
+                                  URL.revokeObjectURL(url);
+                                }, 100);
+                              }, 0);
+                              
+                              toast({
+                                title: "Downloaded!",
+                                description: "Right-click the file → Run with PowerShell",
+                                duration: 6000,
+                              });
+                            }}
+                            className="flex items-center gap-2 cursor-pointer"
+                          >
+                            <Download className="w-4 h-4 text-nova-pink" />
                             <span className="font-medium">Download Agent</span>
-                          </div>
-                        </DropdownMenuItem>
-                      )}
+                          </DropdownMenuItem>
+                        )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
