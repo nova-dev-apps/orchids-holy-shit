@@ -864,13 +864,10 @@ const AIChat = () => {
               placeholder={getPlaceholder()}
               hideAttachments={false}
               activeTab={activeTab}
-              strictMode={strictMode}
-                onToggleStrictMode={() => setStrictMode(!strictMode)}
-                  isAdmin={isAdmin}
-                  onAutoModeToggle={setIsAutoMode}
-                  isGenerating={isThinking}
-                  onStop={handleStop}
-                />
+              onAutoModeToggle={setIsAutoMode}
+              isGenerating={isThinking}
+              onStop={handleStop}
+            />
           </div>
         </div>
       </div>
