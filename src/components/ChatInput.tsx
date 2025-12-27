@@ -183,55 +183,72 @@ export const ChatInput = ({ message, setMessage, onSend, placeholder, disabled, 
                   {isAutoActive && <span className="ml-auto text-xs text-nova-pink">On</span>}
                 </DropdownMenuItem>
               )}
-                  {activeTab === 'chat' && (
-                    <DropdownMenuItem
-                      onClick={() => {
-                        if (isMobileDevice()) {
+                {activeTab === 'chat' && (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (isMobileDevice()) {
+                        toast({
+                          title: "Desktop only",
+                          description: "The local agent is only available for desktop.",
+                          variant: "default",
+                          duration: 3000,
+                        });
+                        return;
+                      }
+                      
+                      fetch('/nova-agent.py')
+                        .then(response => response.text())
+                        .then(pyCode => {
+                          const blob = new Blob([pyCode], { type: 'text/x-python' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = 'nova-agent.py';
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                          
+                          setTimeout(() => {
+                            fetch('/build-nova-agent.bat')
+                              .then(response => response.text())
+                              .then(batCode => {
+                                const batBlob = new Blob([batCode], { type: 'application/bat' });
+                                const batUrl = URL.createObjectURL(batBlob);
+                                const batA = document.createElement('a');
+                                batA.href = batUrl;
+                                batA.download = 'build-nova-agent.bat';
+                                document.body.appendChild(batA);
+                                batA.click();
+                                document.body.removeChild(batA);
+                                URL.revokeObjectURL(batUrl);
+                              });
+                          }, 500);
+                          
                           toast({
-                            title: "Desktop only",
-                            description: "The local agent is only available for desktop.",
+                            title: "Downloaded!",
+                            description: "Run build-nova-agent.bat to create NovaAgent.exe",
                             variant: "default",
+                            duration: 6000,
+                          });
+                        })
+                        .catch(() => {
+                          toast({
+                            title: "Download failed",
+                            description: "Could not download the agent files.",
+                            variant: "destructive",
                             duration: 3000,
                           });
-                          return;
-                        }
-                        
-                        fetch('/nova-local-agent.html')
-                          .then(response => response.text())
-                          .then(html => {
-                            const blob = new Blob([html], { type: 'text/html' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = 'nova-local-agent.html';
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                            toast({
-                              title: "Downloaded!",
-                              description: "Open nova-local-agent.html in your browser to run the agent.",
-                              variant: "default",
-                              duration: 5000,
-                            });
-                          })
-                          .catch(() => {
-                            toast({
-                              title: "Download failed",
-                              description: "Could not download the agent file.",
-                              variant: "destructive",
-                              duration: 3000,
-                            });
-                          });
-                      }}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <Download className="w-4 h-4 text-nova-pink" />
-                      <div className="flex flex-col">
-                        <span className="font-medium">Download Agent</span>
-                      </div>
-                    </DropdownMenuItem>
-                  )}
+                        });
+                    }}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Download className="w-4 h-4 text-nova-pink" />
+                    <div className="flex flex-col">
+                      <span className="font-medium">Download Agent</span>
+                    </div>
+                  </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
