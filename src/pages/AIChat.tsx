@@ -5,6 +5,8 @@ import { ChatInput, Attachment } from "@/components/ChatInput";
 import AISettingsPanel from "@/components/AISettingsPanel";
 import UserSettingsPanel from "@/components/UserSettingsPanel";
 import ChatHistory from "@/components/ChatHistory";
+import { OnboardingModal } from "@/components/OnboardingModal";
+import { AutomationPlan, PlanStep } from "@/components/AutomationPlan";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import ReactMarkdown from 'react-markdown';
