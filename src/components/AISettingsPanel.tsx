@@ -158,9 +158,9 @@ const AISettingsPanel = ({
         onChange={(e) => setChatSettings(prev => ({ ...prev, personalInstructions: e.target.value }))}
         className="min-h-[150px] resize-none border-border focus:ring-1 focus:ring-nova-pink bg-background/50 text-sm"
       />
-      <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed italic">
-        Your personal instructions are combined with the platform global rules to customize your AI experience.
-      </p>
+        <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed italic">
+          Personalize how the AI responds to you.
+        </p>
       <Button 
         onClick={handleSavePersonalSettings} 
         variant="outline"
