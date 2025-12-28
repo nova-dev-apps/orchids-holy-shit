@@ -39,7 +39,8 @@ jobs:
           $headers = @{
             "Authorization" = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwYmNnYnB6b2pyYWtna3ZpbGFzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Njc5ODQ2NSwiZXhwIjoyMDgyMzc0NDY1fQ.IJ1FdI0MPCxTW12MxoNhQUdA8Hw27aPiCVVFJJRZj0U"
             "Content-Type" = "application/octet-stream"
+            "x-upsert" = "true"
           }
           $uri = "https://qpbcgbpzojrakgkvilas.supabase.co/storage/v1/object/downloads/NovaAgent.exe"
-          Invoke-RestMethod -Uri $uri -Method Put -Headers $headers -InFile "dist/NovaAgent.exe"
+          Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -InFile "dist/NovaAgent.exe"
           Write-Host "Uploaded to Supabase Storage"
